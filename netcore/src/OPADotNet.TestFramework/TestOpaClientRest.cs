@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OPADotNet.TestFramework
 {
-    public class TestOpaClientRest : RestOpaClient
+    internal class TestOpaClientRest : RestOpaClient
     {
         private readonly OpaClientEmbedded _opaClientEmbedded;
         private readonly List<Policy> _policies;
@@ -27,6 +27,14 @@ namespace OPADotNet.TestFramework
         public override IPreparedPartial PreparePartial(string query)
         {
             return _opaClientEmbedded.PreparePartial(query);
+        }
+
+        public override Task<T> GetData<T>(string path)
+        {
+            var txn = _opaClientEmbedded.OpaStore.NewTransaction();
+            var data = txn.Read<T>(path);
+            txn.Commit();
+            return Task.FromResult(data);
         }
     }
 }

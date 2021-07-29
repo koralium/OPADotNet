@@ -131,3 +131,24 @@ func UpsertPolicy(storeId C.int, transactionId C.int, policyName *C.char, module
 	return 0
 	//C.callErrorCallback(emptyError, callback)
 }
+
+//export ReadFromStore
+func ReadFromStore(storeId C.int, transactionId C.int, path *C.char) C.int {
+	store := getStore(int(storeId))
+	txn := getTransaction(int(transactionId))
+	pathString := C.GoString(path)
+
+	result, err := readFromStore(store, txn, pathString)
+
+	if err != nil {
+		return addError(err.Error())
+	}
+
+	bytes, err := json.Marshal(result)
+
+	if err != nil {
+		return addError(err.Error())
+	}
+
+	return addString(string(bytes))
+}

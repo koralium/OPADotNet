@@ -39,6 +39,9 @@ namespace OPADotNet.Embedded.Internal
         [DllImport("regosdk", EntryPoint = "WriteToStore", CallingConvention = CallingConvention.Cdecl)]
         public static extern void WriteToStore(int storeId, int transactionId, string path, string input);
 
+        [DllImport("regosdk", EntryPoint = "ReadFromStore", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int ReadFromStore(int storeId, int transactionId, string path);
+
         public delegate void TransactionCallbackDelegate(int transactionId, string error);
 
         [DllImport("regosdk", EntryPoint = "NewTransaction", CallingConvention = CallingConvention.Cdecl)]

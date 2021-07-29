@@ -25,14 +25,30 @@ namespace OPADotNet.TestFramework.Tests
         {
             _server = new OpaTestApiBuilder()
                 .AddPolicy("test", moduleText)
+                .AddData("/roles", new
+                {
+                    name = "test"
+                })
                 .RunServer(5010);
         }
 
         [OneTimeTearDown]
         public async Task Teardown()
         {
-            await _server.StopAsync();
-            _server.Dispose();
+            if (_server != null)
+            {
+                await _server.StopAsync();
+                _server.Dispose();
+            }
+        }
+
+        [Test]
+        public async Task TestGetData()
+        {
+            RestOpaClient restOpaClient = new RestOpaClient("http://127.0.0.1:5010");
+            var rolesData = await restOpaClient.GetData<object>("/roles");
+            var stringContent = rolesData.ToString();
+            Assert.AreEqual("{\"name\":\"test\"}", stringContent);
         }
 
         [Test]

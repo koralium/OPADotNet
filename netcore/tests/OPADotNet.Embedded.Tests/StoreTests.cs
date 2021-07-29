@@ -65,6 +65,21 @@ namespace OPADotNet.Embedded.Tests
             });
         }
 
+        [Test]
+        public void TestRead()
+        {
+            OpaStore opaStore = new OpaStore();
+            var transaction = opaStore.NewTransaction();
+            transaction.Write("/roles", new
+            {
+                test = "test"
+            });
+            transaction.Commit();
+            transaction = opaStore.NewTransaction();
+            var content = transaction.Read("/roles");
+            transaction.Commit();
+            Assert.AreEqual("{\"test\":\"test\"}", content);
+        }
 
 
         private static string moduleData = @"
