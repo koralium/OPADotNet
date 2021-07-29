@@ -1,5 +1,6 @@
 ﻿using OPADotNet.Ast;
 using OPADotNet.Ast.Models;
+using OPADotNet.Core.RestAPI.Models;
 using OPADotNet.Partial.Ast;
 using OPADotNet.RestAPI.Models;
 using System;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace OPADotNet.RestAPI
@@ -32,6 +34,16 @@ namespace OPADotNet.RestAPI
             var content = await result.Content.ReadAsStringAsync();
             var parsed = PartialJsonConverter.ReadPolicyResponse(content);
             return parsed.Result;
+        }
+
+        public virtual async Task<T> GetData<T>(string path)
+        {
+            var httpClient = new HttpClient();
+
+            var result = await httpClient.GetAsync(new Uri(_httpUrl, "/v1/data" + path));
+            var content = await result.Content.ReadAsStringAsync();
+            var deserialized = JsonSerializer.Deserialize<DataResponse<T>>(content);
+            return deserialized.Result;
         }
 
         public virtual IPreparedPartial PreparePartial(string query)

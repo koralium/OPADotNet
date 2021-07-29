@@ -69,6 +69,26 @@ namespace OPADotNet.Embedded
             RegoWrapper.WriteToStore(_store._storeId, _transactionId, path, jsonData);
         }
 
+        public string Read(string path)
+        {
+            var result = RegoWrapper.ReadFromStore(_store._storeId, _transactionId, path);
+
+            if (result < 0)
+            {
+                var error = RegoWrapper.GetString(result);
+                throw new InvalidOperationException(error);
+            }
+
+            var content = RegoWrapper.GetString(result);
+            return content;
+        }
+
+        public T Read<T>(string path)
+        {
+            var str = Read(path);
+            return JsonSerializer.Deserialize<T>(str);
+        }
+
         public void UpsertPolicy(string policyName, string policyData)
         {
             int upsertResult = RegoWrapper.UpsertPolicy(_store._storeId, _transactionId, policyName, policyData);

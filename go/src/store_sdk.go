@@ -43,3 +43,8 @@ func upsertPolicy(store storage.Store, txn storage.Transaction, policyName strin
 	ctx := context.Background()
 	return store.UpsertPolicy(ctx, txn, policyName, []byte(policyData))
 }
+
+func readFromStore(store storage.Store, txn storage.Transaction, path string) (interface{}, error) {
+	ctx := context.Background()
+	return store.Read(ctx, txn, storage.MustParsePath(path))
+}
