@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OPADotNet.Core\OPADotNet.Core.csproj" />
+    <ProjectReference Include="..\OPADotNet.Embedded\OPADotNet.Embedded.csproj" />
+  </ItemGroup>
+
+</Project>

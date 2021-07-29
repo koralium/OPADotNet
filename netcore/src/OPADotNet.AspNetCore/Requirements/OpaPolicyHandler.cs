@@ -1,0 +1,115 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
+using OPADotNet.Ast.Models;
+using OPADotNet.Expressions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace OPADotNet.AspNetCore.Requirements
+{
+    class OpaPolicyHandler : AuthorizationHandler<OpaPolicyRequirement>
+    {
+        private readonly PreparedPartialStore _preparedPartialStore;
+        private readonly ILogger<OpaPolicyHandler> _logger;
+
+        public OpaPolicyHandler(PreparedPartialStore preparedPartialStore, ILogger<OpaPolicyHandler> logger)
+        {
+            _preparedPartialStore = preparedPartialStore;
+            _logger = logger;
+        }
+
+        private OpaInput GetInput(AuthorizationHandlerContext context)
+        {
+            return new OpaInput()
+            {
+                Subject = OpaInputUser.FromPrincipal(context.User),
+                Extensions = new Dictionary<string, object>()
+            };
+        }
+
+        private async Task AuthorizeResource(AuthorizationHandlerContext context, OpaPolicyRequirement requirement)
+        {
+            var input = GetInput(context);
+            //Add the resource as an input, it is up to the user if they want to validate it using input or data
+            input.Extensions.Add(requirement.DataName, context.Resource);
+
+            var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
+            var result = await preparedPartial.Partial(input, new List<string>()
+            {
+                requirement.GetUnknown()
+            });
+
+            if (result.Queries == null)
+            {
+                return;
+            }
+
+            var expr = await new ExpressionConverter().ToExpression(result, requirement.GetUnknown(), context.Resource.GetType());
+
+            var func = expr.Compile();
+
+            if (func(context.Resource))
+            {
+                context.Succeed(requirement);
+            }
+        }
+
+        private async Task AuthorizeQueryable(AuthorizationHandlerContext context, OpaPolicyRequirement requirement, AuthorizeQueryableHolder authorizeQueryableHolder)
+        {
+            var input = GetInput(context);
+
+            var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
+            var result = await preparedPartial.Partial(input, new List<string>()
+            {
+                requirement.GetUnknown()
+            });
+
+            if (result.Queries == null)
+            {
+                return;
+            }
+
+            var expression = await new ExpressionConverter().ToExpression(result, requirement.GetUnknown(), authorizeQueryableHolder.ParameterExpression);
+            authorizeQueryableHolder.AddFilter(expression);
+            context.Succeed(requirement);
+        }
+
+        private async Task AuthorizeRequest(AuthorizationHandlerContext context, OpaPolicyRequirement requirement)
+        {
+            var input = GetInput(context);
+
+            var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
+            var result = await preparedPartial.Partial(input, new List<string>()
+            {
+                requirement.GetUnknown()
+            });
+
+            if (result.Queries != null)
+            {
+                context.Succeed(requirement);
+            }
+        }
+
+        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, OpaPolicyRequirement requirement)
+        {
+            if (!(context.Resource is Microsoft.AspNetCore.Routing.RouteEndpoint) && !(context.Resource is AuthorizeQueryableHolder))
+            {
+                //Resource authorization check
+                await AuthorizeResource(context, requirement);
+            }
+            else if (context.Resource is AuthorizeQueryableHolder holder)
+            {
+                //Queryable, create an expression that can be run.
+                await AuthorizeQueryable(context, requirement, holder);
+            }
+            else
+            {
+                //Not a resource validation, only check that the user can call the endpoint.
+                await AuthorizeRequest(context, requirement);
+            }
+        }
+    }
+}

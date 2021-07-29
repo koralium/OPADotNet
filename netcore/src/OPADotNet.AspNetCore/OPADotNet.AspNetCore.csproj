@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OPADotNet.Embedded\OPADotNet.Embedded.csproj" />
+    <ProjectReference Include="..\OPADotNet.Expressions\OPADotNet.Expressions.csproj" />
+  </ItemGroup>
+
+</Project>

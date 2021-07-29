@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <RuntimeIdentifiers>win-x64;win-x86;linux-x64;linux-x86</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="runtimes\win-x86\native\regosdk.dll" Pack="True" PackagePath="runtimes/win-x86/native" />
+    <None Include="runtimes\linux-x86\native\regosdk.so" Pack="True" PackagePath="runtimes/linux-x86/native" />
+    <None Include="runtimes\linux-x64\native\regosdk.so" Pack="True" PackagePath="runtimes/linux-x64/native" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(OS)|$(Platform)' == 'Windows_NT|AnyCPU' ">
+    <None Include="runtimes\win-x64\native\regosdk.dll" Visible="false" CopyToOutputDirectory="PreserveNewest" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(OS)|$(Platform)' == 'Unix|AnyCPU' ">
+    <None Include="runtimes\linux-x64\native\regosdk.so" Visible="false" CopyToOutputDirectory="PreserveNewest" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OPADotNet.Core\OPADotNet.Core.csproj" />
+  </ItemGroup>
+
+</Project>

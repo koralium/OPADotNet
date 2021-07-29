@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <!--<RestoreProjectStyle>PackageReference</RestoreProjectStyle>-->
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OPADotNet\OPADotNet.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="runtimes\win-x64\native\regosdk.dll" Pack="True" PackagePath="runtimes/win-x64/native" />
+  </ItemGroup>
+
+</Project>
