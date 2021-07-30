@@ -38,8 +38,8 @@ allow {
 
             services.AddAuthorization(opt =>
             {
-                opt.AddPolicy("read", x => x.RequireOpaPolicy("example", "reports"));
-                opt.AddPolicy("test", x => x.RequireOpaPolicy("localpolicy", "testdata"));
+                opt.AddPolicy("read", x => x.RequireOpaPolicy("example", "reports", "GET"));
+                opt.AddPolicy("test", x => x.RequireOpaPolicy("localpolicy", "testdata", "GET"));
             });
         }
 
