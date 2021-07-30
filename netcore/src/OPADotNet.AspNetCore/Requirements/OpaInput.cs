@@ -16,6 +16,9 @@ namespace OPADotNet.AspNetCore.Requirements
         [JsonPropertyName("subject")]
         public OpaInputUser Subject { get; set; }
 
+        [JsonPropertyName("operation")]
+        public string Operation { get; set; }
+
         [JsonExtensionData]
         public Dictionary<string, object> Extensions { get; set; }
     }

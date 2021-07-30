@@ -21,20 +21,21 @@ namespace OPADotNet.AspNetCore.Requirements
             _logger = logger;
         }
 
-        private OpaInput GetInput(AuthorizationHandlerContext context)
+        private OpaInput GetInput(AuthorizationHandlerContext context, OpaPolicyRequirement requirement)
         {
             return new OpaInput()
             {
                 Subject = OpaInputUser.FromPrincipal(context.User),
-                Extensions = new Dictionary<string, object>()
+                Extensions = new Dictionary<string, object>(),
+                Operation = requirement.Operation
             };
         }
 
         private async Task AuthorizeResource(AuthorizationHandlerContext context, OpaPolicyRequirement requirement)
         {
-            var input = GetInput(context);
+            var input = GetInput(context, requirement);
             //Add the resource as an input, it is up to the user if they want to validate it using input or data
-            input.Extensions.Add(requirement.DataName, context.Resource);
+            input.Extensions.Add(requirement.GetInputResourceName(), context.Resource);
 
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
             var result = await preparedPartial.Partial(input, new List<string>()
@@ -59,7 +60,7 @@ namespace OPADotNet.AspNetCore.Requirements
 
         private async Task AuthorizeQueryable(AuthorizationHandlerContext context, OpaPolicyRequirement requirement, AuthorizeQueryableHolder authorizeQueryableHolder)
         {
-            var input = GetInput(context);
+            var input = GetInput(context, requirement);
 
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
             var result = await preparedPartial.Partial(input, new List<string>()
@@ -77,9 +78,35 @@ namespace OPADotNet.AspNetCore.Requirements
             context.Succeed(requirement);
         }
 
+        private async Task AuthorizeInputObjDataObj(AuthorizationHandlerContext context, OpaPolicyRequirement requirement, AuthorizeResourceDataHolder holder)
+        {
+            var input = GetInput(context, requirement);
+            input.Extensions.Add(requirement.GetInputResourceName(), holder.Resource);
+
+            var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
+            var result = await preparedPartial.Partial(input, new List<string>()
+            {
+                requirement.GetUnknown()
+            });
+
+            if (result.Queries == null)
+            {
+                return;
+            }
+
+            var expr = await new ExpressionConverter().ToExpression(result, requirement.GetUnknown(), holder.Data.GetType());
+
+            var func = expr.Compile();
+
+            if (func(holder.Data))
+            {
+                context.Succeed(requirement);
+            }
+        }
+
         private async Task AuthorizeRequest(AuthorizationHandlerContext context, OpaPolicyRequirement requirement)
         {
-            var input = GetInput(context);
+            var input = GetInput(context, requirement);
 
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
             var result = await preparedPartial.Partial(input, new List<string>()
@@ -95,7 +122,7 @@ namespace OPADotNet.AspNetCore.Requirements
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, OpaPolicyRequirement requirement)
         {
-            if (!(context.Resource is Microsoft.AspNetCore.Routing.RouteEndpoint) && !(context.Resource is AuthorizeQueryableHolder))
+            if (!(context.Resource is Microsoft.AspNetCore.Routing.RouteEndpoint) && !(context.Resource is AuthorizeQueryableHolder) && !(context.Resource is AuthorizeResourceDataHolder))
             {
                 //Resource authorization check
                 await AuthorizeResource(context, requirement);
@@ -104,6 +131,10 @@ namespace OPADotNet.AspNetCore.Requirements
             {
                 //Queryable, create an expression that can be run.
                 await AuthorizeQueryable(context, requirement, holder);
+            }
+            else if (context.Resource is AuthorizeResourceDataHolder resourceDataHolder)
+            {
+                await AuthorizeInputObjDataObj(context, requirement, resourceDataHolder);
             }
             else
             {

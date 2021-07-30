@@ -31,6 +31,12 @@ namespace Microsoft.AspNetCore.Authorization
             return (authResult, Enumerable.Empty<T>().AsQueryable());
         }
 
+        public static async Task<AuthorizationResult> AuthorizeAsync(this IAuthorizationService authorizationService, ClaimsPrincipal user, object inputResource, object dataObject, string policyName)
+        {
+            var holder = new AuthorizeResourceDataHolder(inputResource, dataObject);
+            return await authorizationService.AuthorizeAsync(user, holder, policyName);
+        }
+
         /// <summary>
         /// 
         /// </summary>
