@@ -36,7 +36,7 @@ allow {
                 })
                 .RunServer(5020);
 
-            OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded(new OpaStore());
+            OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded();
             SyncContext syncContext = new SyncContext(new List<SyncPolicyDescriptor>()
             {
                 new SyncPolicyDescriptor()
@@ -49,7 +49,7 @@ allow {
             OpaServerSync opaServerSync = new OpaServerSync(new OpaServerSyncOptions()
             {
                 OpaServerUrl = "http://127.0.0.1:5020"
-            });
+            }, null);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             await opaServerSync.FullLoad(syncContext, cancellationTokenSource.Token);
 

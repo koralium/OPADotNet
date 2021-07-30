@@ -39,9 +39,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 {
                     services.AddSingleton(serviceType);
                 }
-                var store = new OpaStore();
-                services.AddSingleton(store);
-                var embeddedClient = new OpaClientEmbedded(store);
+                
+                var embeddedClient = new OpaClientEmbedded();
+                services.AddSingleton(embeddedClient.OpaStore);
                 services.AddSingleton(embeddedClient);
                 services.AddSingleton<IOpaClient>(x => x.GetRequiredService<OpaClientEmbedded>());
             }

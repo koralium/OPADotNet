@@ -15,10 +15,23 @@ namespace OPADotNet.Embedded
     {
         private int _preparedQueryId;
         private bool disposedValue;
+        private readonly string _query;
+        private readonly OpaStore _opaStore;
 
-        internal PreparedPartialEmbedded(OpaCompiler compiler, OpaStore opaStore, string query)
+        internal PreparedPartialEmbedded(OpaStore opaStore, string query)
         {
-            int result = RegoWrapper.PreparePartial(compiler.compilerId, opaStore._storeId, query);
+            _query = query;
+            _opaStore = opaStore;
+            Update();
+        }
+
+        internal void Update()
+        {
+            if (_preparedQueryId > 0)
+            {
+                RegoWrapper.RemovePartialQuery(_preparedQueryId);
+            }
+            int result = RegoWrapper.PreparePartial(_opaStore.GetCompiler().compilerId, _opaStore._storeId, _query);
 
             if (result < 0)
             {

@@ -14,7 +14,7 @@ namespace OPADotNet.Embedded.Tests
         {
             Assert.DoesNotThrow(() =>
             {
-                OpaStore opaStore = new OpaStore();
+                OpaStore opaStore = new OpaStore(null);
             });
         }
 
@@ -23,7 +23,7 @@ namespace OPADotNet.Embedded.Tests
         {
             Assert.DoesNotThrow(() =>
             {
-                OpaStore opaStore = new OpaStore();
+                OpaStore opaStore = new OpaStore(null);
                 opaStore.NewTransaction(true);
             });
         }
@@ -33,7 +33,7 @@ namespace OPADotNet.Embedded.Tests
         {
             Assert.DoesNotThrow(() =>
             {
-                OpaStore opaStore = new OpaStore();
+                OpaStore opaStore = new OpaClientEmbedded().OpaStore;
                 var transaction = opaStore.NewTransaction(true);
                 transaction.UpsertPolicy("policy", moduleData);
             });
@@ -44,7 +44,7 @@ namespace OPADotNet.Embedded.Tests
         {
             Assert.DoesNotThrow(() =>
             {
-                OpaStore opaStore = new OpaStore();
+                OpaStore opaStore = new OpaClientEmbedded().OpaStore;
                 var transaction = opaStore.NewTransaction(true);
                 transaction.UpsertPolicy("policy", moduleData);
                 transaction.Commit();
@@ -56,7 +56,7 @@ namespace OPADotNet.Embedded.Tests
         {
             Assert.DoesNotThrow(() =>
             {
-                OpaStore opaStore = new OpaStore();
+                OpaStore opaStore = new OpaClientEmbedded().OpaStore;
                 var transaction = opaStore.NewTransaction(true);
                 transaction.Write("/roles", new
                 {
@@ -68,7 +68,7 @@ namespace OPADotNet.Embedded.Tests
         [Test]
         public void TestRead()
         {
-            OpaStore opaStore = new OpaStore();
+            OpaStore opaStore = new OpaClientEmbedded().OpaStore;
             var transaction = opaStore.NewTransaction(true);
             transaction.Write("/roles", new
             {
@@ -84,7 +84,7 @@ namespace OPADotNet.Embedded.Tests
         [Test]
         public void TestReadDuringWrite()
         {
-            OpaStore opaStore = new OpaStore();
+            OpaStore opaStore = new OpaClientEmbedded().OpaStore;
             var transaction = opaStore.NewTransaction(true);
             transaction.Write("/roles", new
             {
