@@ -44,7 +44,8 @@ namespace OPADotNet.TestFramework
 
         private OpaClientEmbedded CreateEmbeddedClient()
         {
-            OpaStore store = new OpaStore();
+            var client = new OpaClientEmbedded();
+            OpaStore store = client.OpaStore;
             var txn = store.NewTransaction(true);
             foreach(var policy in _policies)
             {
@@ -56,7 +57,7 @@ namespace OPADotNet.TestFramework
                 txn.Write(data.Key, data.Value);
             }
             txn.Commit();
-            return new OpaClientEmbedded(store);
+            return client;
         }
 
         private List<Policy> GetPolicies()

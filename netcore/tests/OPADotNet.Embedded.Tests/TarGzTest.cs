@@ -17,7 +17,7 @@ namespace OPADotNet.Embedded.Tests
         {
             var tarGzSync = new LocalTarGzSync("test.tar.gz");
 
-            OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded(new OpaStore());
+            OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded();
             SyncContext syncContext = new SyncContext(new List<SyncPolicyDescriptor>()
             {
                 new SyncPolicyDescriptor()

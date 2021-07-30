@@ -17,11 +17,12 @@ namespace OPADotNet.Embedded.Tests
         {
             Assert.DoesNotThrow(() =>
             {
-                OpaStore opaStore = new OpaStore();
+                OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded();
+                OpaStore opaStore = opaClientEmbedded.OpaStore;
                 var txn = opaStore.NewTransaction(true);
                 txn.UpsertPolicy("policy", moduleData);
                 txn.Commit();
-                OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded(opaStore);
+                
                 opaClientEmbedded.PreparePartial("data.example.allow == true");
             });
         }
@@ -31,11 +32,12 @@ namespace OPADotNet.Embedded.Tests
         {
             Assert.DoesNotThrowAsync(async () =>
             {
-                OpaStore opaStore = new OpaStore();
+                OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded();
+                OpaStore opaStore = opaClientEmbedded.OpaStore;
                 var txn = opaStore.NewTransaction(true);
                 txn.UpsertPolicy("policy", moduleData);
                 txn.Commit();
-                OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded(opaStore);
+
                 var preparedPartial = opaClientEmbedded.PreparePartial("data.example.allow == true");
 
                 await preparedPartial.Partial(new
@@ -82,47 +84,6 @@ allow {
             public int test_level { get; set; }
 
             public List<string> Members { get; set; }
-        }
-
-        [Test]
-        public async Task TestPartial()
-        {
-            OpaCompiler opaCompiler = new OpaCompiler(new Dictionary<string, string>());
-            //opaCompiler.CompileModule("example.rego", moduleData);
-
-            OpaStore store = new OpaStore();
-            var txn = store.NewTransaction(true);
-            txn.Write("/roles", new
-            {
-                identity = "test"
-            });
-
-            txn.Commit();
-
-            OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded(store);
-            var preparedPartial = opaClientEmbedded.PreparePartial("data.example.allow == true");
-
-            ExpressionConverter expressionConverter = new ExpressionConverter();
-
-            //var expr = await expressionConverter.ToExpression<TestModel>(preparedPartial, new
-            //{
-            //    subject = new {
-            //        login = "test",
-            //        clearance_level = 20
-            //    },
-            //    method = "GET"
-            //}, "data.reports");
-
-            var r = await preparedPartial.Partial(new
-            {
-                identity = "bob",
-                method = "GET"
-            }, new List<string>()
-            {
-                "data.reports"
-            });
-
-            Assert.Pass();
         }
     }
 }

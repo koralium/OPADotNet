@@ -81,7 +81,7 @@ user_is_admin {
         [Test]
         public void TestGetDataSets()
         {
-            OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded(new OpaStore());
+            OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded();
             SyncContext syncContext = new SyncContext(new List<SyncPolicyDescriptor>()
             {
                 new SyncPolicyDescriptor()

@@ -14,6 +14,8 @@ namespace OPADotNet.Embedded.sync
         private readonly List<SyncPolicyDescriptor> _syncPolicyDescriptors;
         private readonly IServiceProvider _serviceProvider;
 
+        private readonly List<Task> _backgroundTasks = new List<Task>();
+
         public SyncHandler(
             OpaClientEmbedded opaClientEmbedded, 
             List<ISyncService> syncServices, 
@@ -66,6 +68,16 @@ namespace OPADotNet.Embedded.sync
                 {
                     throw new InvalidOperationException($"Could not find any policy with the name: '{policy.PolicyName}'");
                 }
+            }
+
+            foreach(var syncService in _syncServices)
+            {
+                var backgroundTask = Task.Factory.StartNew(async () =>
+                {
+                    await syncService.BackgroundRun(syncContext, cancellationTokenSource.Token);
+                }, TaskCreationOptions.LongRunning)
+                    .Unwrap();
+                _backgroundTasks.Add(backgroundTask);
             }
             
         }

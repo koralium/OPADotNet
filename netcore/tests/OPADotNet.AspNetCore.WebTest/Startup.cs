@@ -29,7 +29,7 @@ allow {
             services.AddControllers();
             //Add OPA and connects to an OPA server to get the policies and data required.
             services.AddOpa(x => x
-                    .OpaServerSync("http://127.0.0.1:8181")
+                    .OpaServerSync("http://127.0.0.1:8181", TimeSpan.FromSeconds(10))
                     .Local(opt =>
                     {
                         opt.AddPolicy(moduleData);

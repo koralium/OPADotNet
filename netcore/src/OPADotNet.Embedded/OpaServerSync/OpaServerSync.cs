@@ -1,4 +1,5 @@
-﻿using OPADotNet.Embedded.sync;
+﻿using Microsoft.Extensions.Logging;
+using OPADotNet.Embedded.sync;
 using OPADotNet.RestAPI;
 using System;
 using System.Collections.Generic;
@@ -13,19 +14,29 @@ namespace OPADotNet.Embedded.Sync
     {
         private readonly OpaServerSyncOptions _opaServerSyncOptions;
         private readonly RestOpaClient _restOpaClient;
+        private readonly ILogger<OpaServerSync> _logger;
 
-        public OpaServerSync(OpaServerSyncOptions opaServerSyncOptions)
+        public OpaServerSync(OpaServerSyncOptions opaServerSyncOptions, ILogger<OpaServerSync> logger)
         {
             _opaServerSyncOptions = opaServerSyncOptions;
             _restOpaClient = new RestOpaClient(opaServerSyncOptions.OpaServerUrl);
+            _logger = logger;
         }
 
         public override async Task BackgroundRun(SyncContext syncContext, CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(_opaServerSyncOptions.Interval);
-                await FullLoad(syncContext, cancellationToken);
+                try
+                {
+                    await Task.Delay(_opaServerSyncOptions.Interval);
+                    await FullLoad(syncContext, cancellationToken);
+                }
+                catch(Exception e)
+                {
+                    _logger.LogWarning(e, "Could not update policies and data from OPA server");
+                }
+                
             }
         }
 

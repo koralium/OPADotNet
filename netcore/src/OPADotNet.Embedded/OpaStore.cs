@@ -13,10 +13,12 @@ namespace OPADotNet.Embedded
         private bool disposedValue;
         private OpaCompiler _opaCompiler;
         internal IReadOnlyDictionary<string, string> _modules = new Dictionary<string, string>();
+        private readonly OpaClientEmbedded _opaClientEmbedded;
 
-        public OpaStore()
+        public OpaStore(OpaClientEmbedded opaClientEmbedded)
         {
             _storeId = RegoWrapper.NewStore();
+            _opaClientEmbedded = opaClientEmbedded;
         }
 
         internal OpaCompiler GetCompiler()
@@ -31,6 +33,7 @@ namespace OPADotNet.Embedded
         internal void NewCompiler()
         {
             _opaCompiler = new OpaCompiler(_modules);
+            _opaClientEmbedded.UpdatePrepared();
         }
 
         public OpaTransaction NewTransaction(bool write)
