@@ -45,7 +45,7 @@ namespace OPADotNet.TestFramework
         private OpaClientEmbedded CreateEmbeddedClient()
         {
             OpaStore store = new OpaStore();
-            var txn = store.NewTransaction();
+            var txn = store.NewTransaction(true);
             foreach(var policy in _policies)
             {
                 txn.UpsertPolicy(policy.Key, policy.Value);

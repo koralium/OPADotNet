@@ -31,8 +31,16 @@ namespace OPADotNet.TestFramework
 
         public override Task<T> GetData<T>(string path)
         {
-            var txn = _opaClientEmbedded.OpaStore.NewTransaction();
+            var txn = _opaClientEmbedded.OpaStore.NewTransaction(false);
             var data = txn.Read<T>(path);
+            txn.Commit();
+            return Task.FromResult(data);
+        }
+
+        public override Task<string> GetDataJson(string path)
+        {
+            var txn = _opaClientEmbedded.OpaStore.NewTransaction(false);
+            var data = txn.Read(path);
             txn.Commit();
             return Task.FromResult(data);
         }

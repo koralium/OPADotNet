@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using OPADotNet.Embedded.sync;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace OPADotNet.AspNetCore.Builder
@@ -7,37 +10,36 @@ namespace OPADotNet.AspNetCore.Builder
     public class OpaBuilder
     {
         private string _opaServerUrl;
-        private bool _useEmbedded = true;
-        private TimeSpan _syncTime;
+        private bool _useEmbedded = false;
+        private readonly List<ISyncService> _syncServices = new List<ISyncService>();
+        private readonly List<Type> _syncServiceTypes = new List<Type>();
+
+        internal OpaBuilder(IServiceCollection services)
+        {
+            Services = services;
+        }
+
+        public IServiceCollection Services { get; }
 
         /// <summary>
-        /// Contains policies that will be compiled if running in the embedded mode
-        /// </summary>
-        public List<OpaBuilderPolicy> Policies { get; } = new List<OpaBuilderPolicy>();
-
-        /// <summary>
-        /// Add a connection to an OPA server.
-        /// 
-        /// If using embedded mode, policies and data will be collected from the OPA server.
-        /// If sync time is set, it will sync policies and data on that interval
+        /// Add a connection to an OPA server. This removes the built in embedded mode, which will reduce performance.
         /// </summary>
         /// <param name="url"></param>
-        public OpaBuilder OpaServer(string url, TimeSpan syncTime = default(TimeSpan))
+        public OpaBuilder UseOpaServer(string url)
         {
             _opaServerUrl = url;
-            _syncTime = syncTime;
             return this;
         }
 
-        /// <summary>
-        /// If using embedded mode, this will add a policy
-        /// </summary>
-        /// <param name="policyName"></param>
-        /// <param name="module"></param>
-        /// <returns></returns>
-        public OpaBuilder AddPolicy(string policyName, string module)
+        public OpaBuilder AddSyncService<T>(T service) where T : ISyncService
         {
-            Policies.Add(new OpaBuilderPolicy(policyName, module));
+            _syncServices.Add(service);
+            return this;
+        }
+
+        public OpaBuilder AddSyncService<T>() where T: ISyncService
+        {
+            _syncServiceTypes.Add(typeof(T));
             return this;
         }
 
@@ -46,26 +48,34 @@ namespace OPADotNet.AspNetCore.Builder
         /// </summary>
         /// <param name="useEmbedded"></param>
         /// <returns></returns>
-        public OpaBuilder UseEmbedded(bool useEmbedded = true)
+        public OpaBuilder UseEmbedded()
         {
-            _useEmbedded = useEmbedded;
+            _useEmbedded = true;
             return this;
         }
 
         internal OpaOptions Build()
         {
-            if (!_useEmbedded && Policies.Count > 0)
-            {
-                throw new InvalidOperationException("Cannot use provided policies without embedded mode.");
-            }
-
             Uri url = null;
             if (_opaServerUrl != null)
             {
                 url = new Uri(_opaServerUrl);
             }
 
-            return new OpaOptions(url, Policies, _useEmbedded, _syncTime);
+            if (_opaServerUrl != null && _useEmbedded)
+            {
+                throw new InvalidOperationException("Cannot run both embedded mode and Opa server mode.");
+            }
+
+            if (_opaServerUrl != null && (_syncServices.Count > 0 || _syncServiceTypes.Count > 0))
+            {
+                throw new InvalidOperationException("Cannot run both policy and data sync with opa server mode.");
+            }
+
+            //We always use embedded mode if OPA server is not entered.
+            bool embeddedMode = _opaServerUrl == null;
+
+            return new OpaOptions(url, embeddedMode, _syncServices.ToList(), _syncServiceTypes.ToList());
         }
     }
 }

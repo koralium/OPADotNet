@@ -15,23 +15,9 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddOpa(this IServiceCollection services, string opaServerUrl)
-        {
-            services.AddSingleton(new RestOpaClient(opaServerUrl));
-            services.AddSingleton(new OpaClientEmbedded(new OpaStore()));
-            services.AddSingleton<PreparedPartialStore>();
-            services.AddSingleton<IOpaClient>(x => x.GetRequiredService<OpaClientEmbedded>());
-
-            services.AddHostedService<FinalizeWorker>();
-
-            services.AddSingleton<IAuthorizationHandler, OpaPolicyHandler>();
-
-            return services;
-        }
-
         public static IServiceCollection AddOpa(this IServiceCollection services, Action<OpaBuilder> options)
         {
-            var builder = new OpaBuilder();
+            var builder = new OpaBuilder(services);
             options?.Invoke(builder);
             var opt = builder.Build();
 
@@ -45,19 +31,19 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 restOpaClient = new RestOpaClient(opt.OpaServer);
                 services.AddSingleton(restOpaClient);
+                services.AddSingleton<IOpaClient>(x => x.GetRequiredService<RestOpaClient>());
             }
-
-            if (opt.UseEmbedded)
+            else if (opt.UseEmbedded)
             {
+                foreach(var serviceType in opt.SyncServiceTypes)
+                {
+                    services.AddSingleton(serviceType);
+                }
                 var store = new OpaStore();
                 services.AddSingleton(store);
                 var embeddedClient = new OpaClientEmbedded(store);
                 services.AddSingleton(embeddedClient);
                 services.AddSingleton<IOpaClient>(x => x.GetRequiredService<OpaClientEmbedded>());
-            }
-            else
-            {
-                services.AddSingleton<IOpaClient>(x => x.GetRequiredService<RestOpaClient>());
             }
 
             services.AddHostedService<FinalizeWorker>();

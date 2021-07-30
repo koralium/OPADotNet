@@ -17,13 +17,13 @@ namespace OpaDotNet.ConsoleTest
 
             OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded(store);
 
-            var sync = new OpaSyncBuilder()
-                .SetRestClient(restOpaClient)
-                .AddModule("data.example", "data.reports")
-                .SetEmbeddedClient(opaClientEmbedded)
-                .Build();
+            //var sync = new OpaSyncBuilder()
+            //    .SetRestClient(restOpaClient)
+            //    .AddModule("data.example", "data.reports")
+            //    .SetEmbeddedClient(opaClientEmbedded)
+            //    .Build();
 
-            sync.Start().Wait();
+            //sync.Start().Wait();
 
             var partial = opaClientEmbedded.PreparePartial("data.example.allow == true");
 

@@ -24,7 +24,7 @@ namespace OPADotNet.Embedded.Tests
             Assert.DoesNotThrow(() =>
             {
                 OpaStore opaStore = new OpaStore();
-                opaStore.NewTransaction();
+                opaStore.NewTransaction(true);
             });
         }
 
@@ -34,7 +34,7 @@ namespace OPADotNet.Embedded.Tests
             Assert.DoesNotThrow(() =>
             {
                 OpaStore opaStore = new OpaStore();
-                var transaction = opaStore.NewTransaction();
+                var transaction = opaStore.NewTransaction(true);
                 transaction.UpsertPolicy("policy", moduleData);
             });
         }
@@ -45,7 +45,7 @@ namespace OPADotNet.Embedded.Tests
             Assert.DoesNotThrow(() =>
             {
                 OpaStore opaStore = new OpaStore();
-                var transaction = opaStore.NewTransaction();
+                var transaction = opaStore.NewTransaction(true);
                 transaction.UpsertPolicy("policy", moduleData);
                 transaction.Commit();
             });
@@ -57,7 +57,7 @@ namespace OPADotNet.Embedded.Tests
             Assert.DoesNotThrow(() =>
             {
                 OpaStore opaStore = new OpaStore();
-                var transaction = opaStore.NewTransaction();
+                var transaction = opaStore.NewTransaction(true);
                 transaction.Write("/roles", new
                 {
                     test = "test"
@@ -69,16 +69,36 @@ namespace OPADotNet.Embedded.Tests
         public void TestRead()
         {
             OpaStore opaStore = new OpaStore();
-            var transaction = opaStore.NewTransaction();
+            var transaction = opaStore.NewTransaction(true);
             transaction.Write("/roles", new
             {
                 test = "test"
             });
             transaction.Commit();
-            transaction = opaStore.NewTransaction();
+            transaction = opaStore.NewTransaction(false);
             var content = transaction.Read("/roles");
             transaction.Commit();
             Assert.AreEqual("{\"test\":\"test\"}", content);
+        }
+
+        [Test]
+        public void TestReadDuringWrite()
+        {
+            OpaStore opaStore = new OpaStore();
+            var transaction = opaStore.NewTransaction(true);
+            transaction.Write("/roles", new
+            {
+                test = "test"
+            });
+
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                transaction = opaStore.NewTransaction(false);
+                var content = transaction.Read("/roles");
+                transaction.Commit();
+            });
+           
+            transaction.Commit();
         }
 
 

@@ -21,17 +21,22 @@ func newStore() storage.Store {
 	return inmem.New()
 }
 
-func newTransaction(store storage.Store) (storage.Transaction, error) {
+func newTransaction(store storage.Store, write bool) (storage.Transaction, error) {
 	ctx := context.Background()
-	return store.NewTransaction(ctx, storage.WriteParams)
+
+	if write {
+		return store.NewTransaction(ctx, storage.WriteParams)
+	} else {
+		return store.NewTransaction(ctx)
+	}
 }
 
-func writeToStore(store storage.Store, txn storage.Transaction, path string, input interface{}) {
+func writeToStore(store storage.Store, txn storage.Transaction, path string, input interface{}) error {
 	ctx := context.Background()
 
-	if err := store.Write(ctx, txn, storage.AddOp, storage.MustParsePath(path), input); err != nil {
-		panic(err)
-	}
+	p := storage.MustParsePath(path)
+	storage.MakeDir(ctx, store, txn, p)
+	return store.Write(ctx, txn, storage.AddOp, p, input)
 }
 
 func commitTransaction(store storage.Store, txn storage.Transaction) error {

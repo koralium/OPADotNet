@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OPADotNet.Embedded.sync;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,18 +9,22 @@ namespace OPADotNet.AspNetCore.Builder
     {
         public Uri OpaServer { get; }
 
-        public IReadOnlyList<OpaBuilderPolicy> Policies { get; }
-
         public bool UseEmbedded { get; }
 
-        public TimeSpan SyncTime { get; }
+        public IReadOnlyList<ISyncService> SyncServices { get; }
 
-        public OpaOptions(Uri opaServer, IReadOnlyList<OpaBuilderPolicy> policies, bool useEmbedded, TimeSpan syncTime)
+        public IReadOnlyList<Type> SyncServiceTypes { get; }
+
+        public OpaOptions(
+            Uri opaServer,
+            bool useEmbedded, 
+            IReadOnlyList<ISyncService> syncServices,
+            IReadOnlyList<Type> syncServiceTypes)
         {
             OpaServer = opaServer;
-            Policies = policies;
             UseEmbedded = useEmbedded;
-            SyncTime = syncTime;
+            SyncServices = syncServices;
+            SyncServiceTypes = syncServiceTypes;
         }
     }
 }

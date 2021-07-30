@@ -18,7 +18,7 @@ namespace OPADotNet.Embedded.Tests
             Assert.DoesNotThrow(() =>
             {
                 OpaStore opaStore = new OpaStore();
-                var txn = opaStore.NewTransaction();
+                var txn = opaStore.NewTransaction(true);
                 txn.UpsertPolicy("policy", moduleData);
                 txn.Commit();
                 OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded(opaStore);
@@ -32,7 +32,7 @@ namespace OPADotNet.Embedded.Tests
             Assert.DoesNotThrowAsync(async () =>
             {
                 OpaStore opaStore = new OpaStore();
-                var txn = opaStore.NewTransaction();
+                var txn = opaStore.NewTransaction(true);
                 txn.UpsertPolicy("policy", moduleData);
                 txn.Commit();
                 OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded(opaStore);
@@ -91,7 +91,7 @@ allow {
             //opaCompiler.CompileModule("example.rego", moduleData);
 
             OpaStore store = new OpaStore();
-            var txn = store.NewTransaction();
+            var txn = store.NewTransaction(true);
             txn.Write("/roles", new
             {
                 identity = "test"

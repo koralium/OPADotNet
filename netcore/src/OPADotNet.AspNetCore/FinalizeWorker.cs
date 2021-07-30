@@ -7,6 +7,7 @@ using OPADotNet.Embedded.sync;
 using OPADotNet.RestAPI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,30 +29,6 @@ namespace OPADotNet.AspNetCore
             _serviceProvider = serviceProvider;
         }
 
-        private List<Policy> GetLocalPolicies()
-        {
-            Dictionary<string, string> localPolicies = new Dictionary<string, string>();
-            foreach(var localModule in _opaOptions.Policies)
-            {
-                localPolicies.Add(localModule.PolicyName, localModule.Module);
-            }
-            var compiler = new OpaCompiler(localPolicies);
-            var astPolicies = compiler.GetPolicies();
-            compiler.Dispose();
-
-            List<Policy> output = new List<Policy>();
-            foreach (var localModule in _opaOptions.Policies)
-            {
-                output.Add(new Policy()
-                {
-                    Ast = astPolicies[localModule.PolicyName],
-                    Id = localModule.PolicyName,
-                    Raw = localModule.Module
-                });
-            }
-            return output;
-        }
-
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             var authPolicyProvider = _serviceProvider.GetService(typeof(IAuthorizationPolicyProvider));
@@ -63,52 +40,28 @@ namespace OPADotNet.AspNetCore
 
             var requirements = RequirementsStore.GetRequirements();
 
-            bool syncEnabled = false;
-
             var embeddedClient = _serviceProvider.GetService(typeof(OpaClientEmbedded)) as OpaClientEmbedded;
 
-            if (_opaOptions.SyncTime != TimeSpan.Zero)
+            if (_opaOptions.UseEmbedded)
             {
-                var restClient = _serviceProvider.GetService(typeof(RestOpaClient)) as RestOpaClient;
-                
-
-                if (restClient != null && embeddedClient != null)
+                List<SyncPolicyDescriptor> syncPolicyDescriptors = new List<SyncPolicyDescriptor>();
+                foreach (var requirement in requirements)
                 {
-                    syncEnabled = true;
-                    var localPolicies = GetLocalPolicies();
-
-                    OpaSyncBuilder opaSyncBuilder = new OpaSyncBuilder();
-
-                    foreach (var localPolicy in localPolicies)
+                    syncPolicyDescriptors.Add(new SyncPolicyDescriptor()
                     {
-                        opaSyncBuilder.AddLocalManagedModule(localPolicy);
-                    }
-
-                    foreach (var requirement in requirements)
-                    {
-                        opaSyncBuilder.AddModule(requirement.ModuleName, requirement.DataName);
-                    }
-
-                    opaSyncBuilder.SetRestClient(restClient);
-                    opaSyncBuilder.SetEmbeddedClient(embeddedClient);
-                    opaSyncBuilder.SyncTime(_opaOptions.SyncTime);
-
-                    var sync = opaSyncBuilder.Build();
-                    await sync.Start();
-                }
-            }
-
-            if (!syncEnabled && embeddedClient != null)
-            {
-                //Add all the local policies directly since sync is not enabled
-                var txn = embeddedClient.OpaStore.NewTransaction();
-
-                foreach (var policy in _opaOptions.Policies)
-                {
-                    txn.UpsertPolicy(policy.PolicyName, policy.Module);
+                        PolicyName = requirement.ModuleName,
+                        Unknown = requirement.DataName
+                    });
                 }
 
-                txn.Commit();
+                SyncHandler syncHandler = new SyncHandler(
+                    embeddedClient, 
+                    _opaOptions.SyncServices.ToList(), 
+                    _opaOptions.SyncServiceTypes.ToList(), 
+                    syncPolicyDescriptors, 
+                    _serviceProvider);
+
+                await syncHandler.Start();
             }
 
             foreach(var requirement in requirements)

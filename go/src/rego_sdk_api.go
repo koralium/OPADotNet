@@ -8,6 +8,7 @@ package main
 import "C"
 import (
 	"encoding/json"
+	"errors"
 	"sync"
 	"unsafe"
 
@@ -31,6 +32,26 @@ func getCompiler(id int) *ast.Compiler {
 		panic("could not find compiler")
 	}
 	return compiler.(*ast.Compiler)
+}
+
+//export CompilePolicy
+func CompilePolicy(fileName *C.char, rawText *C.char) C.int {
+	fileNameGo := C.GoString(fileName)
+	rawTextGo := C.GoString(rawText)
+
+	module, err := compilePolicy(fileNameGo, rawTextGo)
+
+	if err != nil {
+		return addError(err.Error())
+	}
+
+	bytes, err := json.Marshal(module)
+
+	if err != nil {
+		return addError(err.Error())
+	}
+
+	return addString(string(bytes))
 }
 
 //export CompileModules
@@ -126,6 +147,71 @@ func Partial(compilerId int, query *C.char, input *C.char, callback C.evaluate_c
 	partial(compiler, queryData, inputData, goCb)
 }
 
+var evalQueryMutex sync.Mutex
+var evalQueryToken int
+var evalQueryMap sync.Map
+
+//export PrepareEvaluation
+func PrepareEvaluation(compilerId C.int, storeId C.int, query *C.char) C.int {
+	queryData := C.GoString(query)
+	compiler := getCompiler(int(compilerId))
+	store := getStore(int(storeId))
+	preparedQuery, err := prepareForEvaluation(compiler, store, queryData)
+
+	if err != nil {
+		return addError(err.Error())
+	}
+
+	evalQueryMutex.Lock()
+	evalQueryToken++
+	i := evalQueryToken
+	evalQueryMutex.Unlock()
+	evalQueryMap.Store(i, preparedQuery)
+	return C.int(i)
+}
+
+//export RemoveEvalQuery
+func RemoveEvalQuery(evalQueryId C.int) {
+	evalQueryMap.Delete(int(evalQueryId))
+}
+
+func getPreparedEval(evalQueryId int) (rego.PreparedEvalQuery, error) {
+	pq, ok := evalQueryMap.Load(evalQueryId)
+
+	if !ok {
+		return rego.PreparedEvalQuery{}, errors.New("Could not find prepared eval query")
+	}
+
+	return pq.(rego.PreparedEvalQuery), nil
+}
+
+//export PreparedEval
+func PreparedEval(evalId C.int, input *C.char) C.int {
+	inputJson := C.GoString(input)
+	var inputData interface{}
+	json.Unmarshal([]byte(inputJson), &inputData)
+
+	prepared, err := getPreparedEval(int(evalId))
+
+	if err != nil {
+		return addError(err.Error())
+	}
+
+	rs, err := preparedEval(prepared, inputData)
+
+	if err != nil {
+		return addError(err.Error())
+	}
+
+	bytes, err := json.Marshal(rs)
+
+	if err != nil {
+		return addError(err.Error())
+	}
+
+	return addString(string(bytes))
+}
+
 var partialQueryMutex sync.Mutex
 var partialQueryToken int
 var partialQueryMap sync.Map
@@ -138,9 +224,6 @@ func PreparePartial(compilerId int, storeId int, query *C.char) C.int {
 	partialQuery, err := prepareForPartial(compiler, store, queryData)
 
 	if err != nil {
-		// errorMessage := C.CString(err.Error())
-		// C.callPointerCallback(C.int(-1), errorMessage, callback)
-		// C.free(unsafe.Pointer(errorMessage))
 		return addError(err.Error())
 	}
 
@@ -176,21 +259,6 @@ func PreparedPartial(partialId int, input *C.char, unknowns **C.char, unknownsLe
 	json.Unmarshal([]byte(inputJson), &inputData)
 
 	prepared := getPreparedPartial(partialId)
-
-	// goCb := func(rs *rego.PartialQueries) {
-	// 	bytes, err := json.Marshal(rs)
-
-	// 	if err != nil {
-	// 		//TODO
-	// 	}
-
-	// 	//Allocate memory for the string
-	// 	data := C.CString(string(bytes))
-
-	// 	C.callEvaluateCallback(data, callback)
-	// 	//Free allocated memory
-	// 	C.free(unsafe.Pointer(data))
-	// }
 
 	pq, err := preparedPartial(prepared, inputData, unknownsArray)
 

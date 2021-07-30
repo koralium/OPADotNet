@@ -22,6 +22,18 @@ func compileModules(modules map[string]string) (*ast.Compiler, error) {
 	return ast.CompileModules(modules)
 }
 
+func compilePolicy(fileName string, rawText string) (*ast.Module, error) {
+	compiler, err := ast.CompileModules(map[string]string{
+		fileName: rawText,
+	})
+
+	if err != nil {
+		return &ast.Module{}, err
+	}
+
+	return compiler.Modules[fileName], nil
+}
+
 func getModules(compiler *ast.Compiler) map[string]*ast.Module {
 	return compiler.Modules
 }
@@ -47,6 +59,18 @@ func evaluate(compiler *ast.Compiler, query string, input interface{}, callback 
 
 type partialCb func(*rego.PartialQueries)
 
+func prepareForEvaluation(compiler *ast.Compiler, store storage.Store, query string) (rego.PreparedEvalQuery, error) {
+	ctx := context.Background()
+
+	r := rego.New(
+		rego.Query(query),
+		rego.Compiler(compiler),
+		rego.Store(store),
+	)
+
+	return r.PrepareForEval(ctx)
+}
+
 func prepareForPartial(compiler *ast.Compiler, store storage.Store, query string) (rego.PreparedPartialQuery, error) {
 	ctx := context.Background()
 
@@ -57,6 +81,11 @@ func prepareForPartial(compiler *ast.Compiler, store storage.Store, query string
 	)
 
 	return r.PrepareForPartial(ctx)
+}
+
+func preparedEval(prepared rego.PreparedEvalQuery, input interface{}) (rego.ResultSet, error) {
+	ctx := context.Background()
+	return prepared.Eval(ctx, rego.EvalInput(input))
 }
 
 func preparedPartial(prepared rego.PreparedPartialQuery, input interface{}, unknowns []string) (*rego.PartialQueries, error) {

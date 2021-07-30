@@ -11,6 +11,7 @@ namespace OPADotNet.Ast.Models
         String,
         Number,
         Boolean,
-        Object
+        Object,
+        Array
     }
 }

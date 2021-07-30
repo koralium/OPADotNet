@@ -64,8 +64,6 @@ namespace OPADotNet.AspNetCore.WebTest.Controllers
                 }
             };
 
-            await _authorizationService.AuthorizeAsync(HttpContext.User, data[0], "read");
-
             var (authResult, filteredData) = await _authorizationService.AuthorizeQueryable(HttpContext.User, data.AsQueryable(), "read");
 
             if (!authResult.Succeeded)

@@ -12,5 +12,7 @@ namespace OPADotNet.Embedded.sync
         /// The unknown for this policy
         /// </summary>
         public string Unknown { get; set; }
+
+        internal bool Found { get; set; }
     }
 }
