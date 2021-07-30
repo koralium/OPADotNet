@@ -111,5 +111,11 @@ namespace OPADotNet.Ast
         {
             return default;
         }
+
+        public virtual T VisitTermArray(AstTermArray termArray)
+        {
+            Visit(termArray.Value);
+            return default;
+        }
     }
 }

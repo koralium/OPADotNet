@@ -46,6 +46,15 @@ namespace OPADotNet.RestAPI
             return deserialized.Result;
         }
 
+        public virtual async Task<string> GetDataJson(string path)
+        {
+            var httpClient = new HttpClient();
+
+            var result = await httpClient.GetAsync(new Uri(_httpUrl, "/v1/data" + path));
+            var content = await result.Content.ReadAsStringAsync();
+            return content;
+        }
+
         public virtual IPreparedPartial PreparePartial(string query)
         {
             return new RestPreparedPartial(this, query);

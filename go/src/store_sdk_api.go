@@ -35,15 +35,25 @@ func RemoveStore(storeId int) {
 }
 
 //export WriteToStore
-func WriteToStore(storeId C.int, transactionId C.int, path *C.char, input *C.char) {
+func WriteToStore(storeId C.int, transactionId C.int, path *C.char, input *C.char) C.int {
 	pathString := C.GoString(path)
 	inputJson := C.GoString(input)
 
 	var inputData interface{}
-	json.Unmarshal([]byte(inputJson), &inputData)
+	jsonError := json.Unmarshal([]byte(inputJson), &inputData)
+
+	if jsonError != nil {
+		return addError(jsonError.Error())
+	}
+
 	store := getStore(int(storeId))
 	txn := getTransaction(int(transactionId))
-	writeToStore(store, txn, pathString, inputData)
+	err := writeToStore(store, txn, pathString, inputData)
+
+	if err != nil {
+		return addError(err.Error())
+	}
+	return C.int(0)
 }
 
 func getStore(storeId int) storage.Store {
@@ -59,12 +69,22 @@ var transactionMutex sync.Mutex
 var transactionToken int
 var transactionMap sync.Map
 
+func intToBool(b C.int) bool {
+	i := int(b)
+
+	if i == 0 {
+		return false
+	} else {
+		return true
+	}
+}
+
 //export NewTransaction
-func NewTransaction(storeId C.int) C.int {
+func NewTransaction(storeId C.int, write C.int) C.int {
 	id := int(storeId)
 	store := getStore(id)
 
-	txn, err := newTransaction(store)
+	txn, err := newTransaction(store, intToBool(write))
 
 	if err != nil {
 		//errorMessage := C.CString(err.Error())

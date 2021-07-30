@@ -18,16 +18,13 @@ namespace OPADotNet.Embedded.sync
             if (partialTermRef.Value.Count > 1 && partialTermRef.Value[0] is AstTermVar termVar &&
                 termVar.Value == "data")
             {
-                var path = Visit(partialTermRef.Value);
-                var dataName = path[1];
-                dataSets.Add(dataName);
+                SyncDataRefVisitor syncDataRefVisitor = new SyncDataRefVisitor();
+                var dataSet = syncDataRefVisitor.Visit(partialTermRef.Value);
+                dataSets.Add(string.Join(".", dataSet.Where(x => x != null)));
+                dataSets.UnionWith(syncDataRefVisitor.DataSets);
             }
+            
             return null;
-        }
-
-        public override string VisitTermString(AstTermString partialTermString)
-        {
-            return partialTermString.Value;
         }
     }
 }

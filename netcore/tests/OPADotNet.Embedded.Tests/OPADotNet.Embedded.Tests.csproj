@@ -18,8 +18,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\OPADotNet.AspNetCore\OPADotNet.AspNetCore.csproj" />
     <ProjectReference Include="..\..\src\OPADotNet.Embedded\OPADotNet.Embedded.csproj" />
     <ProjectReference Include="..\..\src\OPADotNet.Expressions\OPADotNet.Expressions.csproj" />
+    <ProjectReference Include="..\..\src\OPADotNet.TestFramework\OPADotNet.TestFramework.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="test.tar.gz">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

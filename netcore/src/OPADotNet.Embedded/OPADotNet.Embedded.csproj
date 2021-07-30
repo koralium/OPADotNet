@@ -12,13 +12,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="SharpZipLib" Version="1.3.2" />
     <PackageReference Include="System.Text.Json" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="runtimes\win-x64\native\regosdk.dll" Pack="True" PackagePath="runtimes/win-x64/native" />
-    <None Include="runtimes\win-x86\native\regosdk.dll" Pack="True" PackagePath="runtimes/win-x86/native" />
-    <None Include="runtimes\linux-x86\native\regosdk.so" Pack="True" PackagePath="runtimes/linux-x86/native" />
-    <None Include="runtimes\linux-x64\native\regosdk.so" Pack="True" PackagePath="runtimes/linux-x64/native" />
+    <None Include="runtimes\win-x64\native\regosdk.dll" Visible="false" Pack="True" PackagePath="runtimes/win-x64/native" />
+    <None Include="runtimes\win-x86\native\regosdk.dll" Visible="false" Pack="True" PackagePath="runtimes/win-x86/native" />
+    <None Include="runtimes\linux-x86\native\regosdk.so" Visible="false" Pack="True" PackagePath="runtimes/linux-x86/native" />
+    <None Include="runtimes\linux-x64\native\regosdk.so" Visible="false" Pack="True" PackagePath="runtimes/linux-x64/native" />
   </ItemGroup>
   <ItemGroup Condition=" '$(OS)|$(Platform)' == 'Windows_NT|AnyCPU' ">
     <None Include="runtimes\win-x64\native\regosdk.dll" Visible="false" CopyToOutputDirectory="PreserveNewest" Link="%(RecursiveDir)%(Filename)%(Extension)" />

@@ -14,6 +14,9 @@ namespace OPADotNet.Embedded.Internal
         [DllImport("regosdk", EntryPoint = "CompileModules", CharSet = CharSet.Ansi)]
         public static extern int CompileModules(string modules);
 
+        [DllImport("regosdk", EntryPoint = "CompilePolicy", CharSet = CharSet.Ansi)]
+        public static extern int CompilePolicy(string fileName, string rawText);
+
         [DllImport("regosdk", EntryPoint = "RemoveCompiler")]
         public static extern void RemoveCompiler(int compilerId);
 
@@ -30,6 +33,15 @@ namespace OPADotNet.Embedded.Internal
         [DllImport("regosdk", EntryPoint = "PreparedPartial", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int PreparedPartial(int partialQueryId, string input, string[] unknowns, int unknownsLength);
 
+        [DllImport("regosdk", EntryPoint = "PrepareEvaluation", CharSet = CharSet.Ansi)]
+        public static extern int PrepareEvaluation(int compilerId, int storeId, string query);
+
+        [DllImport("regosdk", EntryPoint = "RemoveEvalQuery")]
+        public static extern void RemoveEvalQuery(int evalQueryId);
+
+        [DllImport("regosdk", EntryPoint = "PreparedEval", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int PreparedEval(int partialQueryId, string input);
+
         [DllImport("regosdk", EntryPoint = "NewStore")]
         public static extern int NewStore();
 
@@ -37,7 +49,7 @@ namespace OPADotNet.Embedded.Internal
         public static extern void RemoveStore(int storeId);
 
         [DllImport("regosdk", EntryPoint = "WriteToStore", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void WriteToStore(int storeId, int transactionId, string path, string input);
+        public static extern int WriteToStore(int storeId, int transactionId, string path, string input);
 
         [DllImport("regosdk", EntryPoint = "ReadFromStore", CallingConvention = CallingConvention.Cdecl)]
         public static extern int ReadFromStore(int storeId, int transactionId, string path);
@@ -45,7 +57,7 @@ namespace OPADotNet.Embedded.Internal
         public delegate void TransactionCallbackDelegate(int transactionId, string error);
 
         [DllImport("regosdk", EntryPoint = "NewTransaction", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int NewTransaction(int storeId);
+        public static extern int NewTransaction(int storeId, int write);
 
         [DllImport("regosdk", EntryPoint = "RemoveTransaction")]
         public static extern void RemoveTransaction(int transactionId);

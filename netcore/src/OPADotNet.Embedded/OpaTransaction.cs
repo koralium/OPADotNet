@@ -69,6 +69,17 @@ namespace OPADotNet.Embedded
             RegoWrapper.WriteToStore(_store._storeId, _transactionId, path, jsonData);
         }
 
+        public void WriteJson(string path, string json)
+        {
+            int result = RegoWrapper.WriteToStore(_store._storeId, _transactionId, path, json);
+
+            if (result < 0)
+            {
+                var error = RegoWrapper.GetString(result);
+                throw new InvalidOperationException(error);
+            }
+        }
+
         public string Read(string path)
         {
             var result = RegoWrapper.ReadFromStore(_store._storeId, _transactionId, path);

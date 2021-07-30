@@ -59,5 +59,10 @@ namespace OPADotNet.Ast
         {
             return JsonSerializer.Deserialize<Dictionary<string, AstPolicy>>(json, _serializerOptions);
         }
+
+        internal static AstPolicy ReadEmbeddedPolicy(string json)
+        {
+            return JsonSerializer.Deserialize<AstPolicy>(json, _serializerOptions);
+        }
     }
 }

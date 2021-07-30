@@ -33,9 +33,10 @@ namespace OPADotNet.Embedded
             _opaCompiler = new OpaCompiler(_modules);
         }
 
-        public OpaTransaction NewTransaction()
+        public OpaTransaction NewTransaction(bool write)
         {
-            var txnId = RegoWrapper.NewTransaction(_storeId);
+            int writeVal = write ? 1 : 0;
+            var txnId = RegoWrapper.NewTransaction(_storeId, writeVal);
             return new OpaTransaction(this, txnId);
         }
 
