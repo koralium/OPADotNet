@@ -11,13 +11,16 @@ allow {
 }
 
 allow {
+  some i
   input.operation = "PUT"
 
+  data.securedata[i].name = input.resource.Name
+
   # Check that the owner has not changed
-  input.resource.Owner = data.securedata.owner
+  input.resource.Owner = data.securedata[i].owner
 
   # Check that the user is the owner of the previous object
-  input.subject.name = data.securedata.owner
+  input.subject.name = data.securedata[i].owner
 }
 
 allow {

@@ -6,6 +6,7 @@ using OPADotNet.AspNetCore.Builder;
 using OPADotNet.AspNetCore.Requirements;
 using OPADotNet.Embedded;
 using OPADotNet.Embedded.sync;
+using OPADotNet.Expressions;
 using OPADotNet.RestAPI;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ namespace Microsoft.Extensions.DependencyInjection
             RestOpaClient restOpaClient = null;
 
             services.AddSingleton<PreparedPartialStore>();
+            services.AddSingleton<ExpressionConverter>();
 
             if (opt.OpaServer != null)
             {

@@ -1,4 +1,5 @@
-﻿using OPADotNet.Expressions.Ast.Models;
+﻿using Microsoft.Extensions.Logging;
+using OPADotNet.Expressions.Ast.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,12 @@ namespace OPADotNet.Expressions.Ast.Conversion
     internal class CleanupVisitor : ExpressionAstVisitor<Node>
     {
         private readonly string _rootUnknown;
-        public CleanupVisitor(string rootUnknown)
+        private readonly ILogger _logger;
+        private string iteratorName;
+        public CleanupVisitor(string rootUnknown, ILogger logger)
         {
             _rootUnknown = rootUnknown;
+            _logger = logger;
         }
 
         private bool RemoveRootUnknown(Reference reference)
@@ -30,6 +34,14 @@ namespace OPADotNet.Expressions.Ast.Conversion
                 if(reference.References[2] is VariableReference variableReference &&
                     variableReference.IsIterator)
                 {
+                    if (iteratorName == null)
+                    {
+                        iteratorName = variableReference.Value;
+                    }
+                    else if (iteratorName != variableReference.Value)
+                    {
+                        throw new InvalidOperationException("Cannot handle self joins");
+                    }
                     reference.References.RemoveRange(0, 3);
                 }
                 else
@@ -42,12 +54,33 @@ namespace OPADotNet.Expressions.Ast.Conversion
             return false;
         }
 
+        public override Node VisitQueries(Queries queries)
+        {
+            for (int i = 0; i < queries.OrQueries.Count; i++)
+            {
+                try
+                {
+                    Visit(queries.OrQueries[i]);
+                }
+                catch(Exception e)
+                {
+                    _logger.LogWarning(e, "Failure in an OR query, removing it from the final query.");
+                    //Remove any or query that caused an exception.
+                    queries.OrQueries.RemoveAt(i);
+                    i--;
+                }
+            }
+            return base.VisitQueries(queries);
+        }
+
         public override Node VisitQuery(Query query)
         {
             for (int i = 0; i < query.AndExpressions.Count; i++)
             {
                 query.AndExpressions[i] = Visit(query.AndExpressions[i]) as BooleanExpression;
             }
+            //Reset the iterator name
+            iteratorName = null;
             return query;
         }
 

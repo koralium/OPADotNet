@@ -1,4 +1,5 @@
-﻿using OPADotNet.Ast.Models;
+﻿using Microsoft.Extensions.Logging;
+using OPADotNet.Ast.Models;
 using OPADotNet.Expressions.Ast;
 using OPADotNet.Expressions.Ast.Conversion;
 using System;
@@ -10,17 +11,23 @@ namespace OPADotNet.Expressions
 {
     public class ExpressionConverter
     {
+        private readonly ILogger<ExpressionConverter> _logger;
+        public ExpressionConverter(ILogger<ExpressionConverter> logger)
+        {
+            _logger = logger;
+        }
+
         public async Task<Expression<Func<object, bool>>> ToExpression(AstQueries partialQueries, string unknown, Type queryType)
         {
             var convertor = new PartialToAstVisitor();
             var ast = convertor.Convert(partialQueries);
-            CleanupVisitor cleanupVisitor = new CleanupVisitor(unknown);
+            CleanupVisitor cleanupVisitor = new CleanupVisitor(unknown, _logger);
             cleanupVisitor.Visit(ast);
 
             ParameterExpression parameterExpression = Expression.Parameter(typeof(object));
             var convertedParameter = Expression.Convert(parameterExpression, queryType);
 
-            AstToExpressionVisitor astToExpressionVisitor = new AstToExpressionVisitor(convertedParameter, queryType);
+            AstToExpressionVisitor astToExpressionVisitor = new AstToExpressionVisitor(convertedParameter, queryType, _logger);
             var expression = astToExpressionVisitor.Visit(ast);
             return Expression.Lambda(expression, parameterExpression) as Expression<Func<object, bool>>;
         }
@@ -29,27 +36,10 @@ namespace OPADotNet.Expressions
         {
             var convertor = new PartialToAstVisitor();
             var ast = convertor.Convert(partialQueries);
-            CleanupVisitor cleanupVisitor = new CleanupVisitor(unknown);
+            CleanupVisitor cleanupVisitor = new CleanupVisitor(unknown, _logger);
             cleanupVisitor.Visit(ast);
-            AstToExpressionVisitor astToExpressionVisitor = new AstToExpressionVisitor(parameterExpression, parameterExpression.Type);
+            AstToExpressionVisitor astToExpressionVisitor = new AstToExpressionVisitor(parameterExpression, parameterExpression.Type, _logger);
             return astToExpressionVisitor.Visit(ast);
         }
-
-        //public async Task<Expression<Func<TType, bool>>> ToExpression<TType>(IPreparedPartial preparedPartial, object input, string unknown)
-        //{
-        //    var partialQueries = await preparedPartial.Partial(input, new List<string>() { unknown });
-
-        //    if (partialQueries == null)
-        //    {
-        //        //Return function that just returns false here
-        //    }
-
-        //    var convertor = new PartialToAstVisitor();
-        //    var ast = convertor.Convert(partialQueries);
-        //    CleanupVisitor cleanupVisitor = new CleanupVisitor(unknown);
-        //    cleanupVisitor.Visit(ast);
-        //    AstToExpressionVisitor astToExpressionVisitor = new AstToExpressionVisitor(typeof(TType));
-        //    return astToExpressionVisitor.Visit(ast) as Expression<Func<TType, bool>>;
-        //}
     }
 }
