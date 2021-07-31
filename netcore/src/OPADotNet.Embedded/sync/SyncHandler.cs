@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -32,6 +33,7 @@ namespace OPADotNet.Embedded.sync
 
         public async Task Start()
         {
+            var logger = _serviceProvider.GetService(typeof(ILogger<SyncHandler>)) as ILogger;
             SyncContext syncContext = new SyncContext(_syncPolicyDescriptors, _opaClientEmbedded);
 
             foreach (var syncServiceType in _syncServiceTypes)
@@ -66,7 +68,8 @@ namespace OPADotNet.Embedded.sync
             {
                 if (!policy.Found)
                 {
-                    throw new InvalidOperationException($"Could not find any policy with the name: '{policy.PolicyName}'");
+                    logger.LogError($"Could not find any policy with the name: '{policy.PolicyName}'");
+                    //throw new InvalidOperationException($"Could not find any policy with the name: '{policy.PolicyName}'");
                 }
             }
 

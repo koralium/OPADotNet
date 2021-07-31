@@ -17,6 +17,12 @@ namespace OPADotNet.Embedded
         public OpaCompiler(IReadOnlyDictionary<string, string> modules)
         {
             compilerId = RegoWrapper.CompileModules(JsonSerializer.Serialize(modules));
+
+            if (compilerId < 0)
+            {
+                var error = RegoWrapper.GetString(compilerId);
+                throw new ArgumentException($"Error in provided modules: {error}", nameof(modules));
+            }
         }
 
         /// <summary>

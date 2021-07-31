@@ -1,10 +1,6 @@
 package main
 
 //#include <stdlib.h>
-// typedef void (*transaction_cb)(int, char*);
-// void callTransactionCallback(int transactionId, char* err, transaction_cb cb);
-// typedef void (*error_cb)(char*);
-// void callErrorCallback(char* err, error_cb cb);
 import "C"
 import (
 	"encoding/json"
@@ -87,10 +83,7 @@ func NewTransaction(storeId C.int, write C.int) C.int {
 	txn, err := newTransaction(store, intToBool(write))
 
 	if err != nil {
-		//errorMessage := C.CString(err.Error())
-		//C.callTransactionCallback(C.int(-1), errorMessage, callback)
-		//defer C.free(unsafe.Pointer(errorMessage))
-		return -1
+		return addError(err.Error())
 	}
 
 	transactionMutex.Lock()
@@ -98,7 +91,6 @@ func NewTransaction(storeId C.int, write C.int) C.int {
 	i := transactionToken
 	transactionMutex.Unlock()
 	transactionMap.Store(i, txn)
-	//C.callTransactionCallback(C.int(i), emptyError, callback)
 	return C.int(i)
 }
 
@@ -124,17 +116,13 @@ func CommitTransaction(storeId C.int, transactionId C.int) C.int {
 	err := commitTransaction(store, txn)
 
 	if err != nil {
-		//errorMessage := C.CString(err.Error())
-		//C.callErrorCallback(errorMessage, callback)
-		//C.free(unsafe.Pointer(errorMessage))
 		return addError(err.Error())
 	}
 	return 0
-	//C.callErrorCallback(emptyError, callback)
 }
 
 //export UpsertPolicy
-func UpsertPolicy(storeId C.int, transactionId C.int, policyName *C.char, module *C.char, callback C.error_cb) int {
+func UpsertPolicy(storeId C.int, transactionId C.int, policyName *C.char, module *C.char) int {
 	store := getStore(int(storeId))
 	txn := getTransaction(int(transactionId))
 
@@ -143,13 +131,9 @@ func UpsertPolicy(storeId C.int, transactionId C.int, policyName *C.char, module
 	err := upsertPolicy(store, txn, goPolicyName, goModule)
 
 	if err != nil {
-		//errorMessage := C.CString(err.Error())
-		//C.callErrorCallback(errorMessage, callback)
-		//C.free(unsafe.Pointer(errorMessage))
-		return -1
+		return int(addError(err.Error()))
 	}
 	return 0
-	//C.callErrorCallback(emptyError, callback)
 }
 
 //export ReadFromStore

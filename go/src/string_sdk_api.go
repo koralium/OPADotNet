@@ -60,3 +60,14 @@ func GetString(index C.int) *C.char {
 	str := val.(*C.char)
 	return str
 }
+
+func GoStrings(argc C.int, argv **C.char) []string {
+
+	length := int(argc)
+	tmpslice := (*[1 << 28]*C.char)(unsafe.Pointer(argv))[:length:length]
+	gostrings := make([]string, length)
+	for i, s := range tmpslice {
+		gostrings[i] = C.GoString(s)
+	}
+	return gostrings
+}

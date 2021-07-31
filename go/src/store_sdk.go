@@ -1,15 +1,5 @@
 package main
 
-// typedef void (*transaction_cb)(int, char*);
-// extern void callTransactionCallback(int transactionId, char* err, transaction_cb cb) {
-//   cb(transactionId, err);
-// }
-// typedef void (*error_cb)(char*);
-// extern void callErrorCallback(char* err, error_cb cb) {
-//   cb(err);
-// }
-import "C"
-
 import (
 	"context"
 
