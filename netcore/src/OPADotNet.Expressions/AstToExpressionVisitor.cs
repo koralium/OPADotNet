@@ -1,4 +1,5 @@
-﻿using OPADotNet.Expressions.Ast;
+﻿using Microsoft.Extensions.Logging;
+using OPADotNet.Expressions.Ast;
 using OPADotNet.Expressions.Ast.Models;
 using OPADotNet.Expressions.Utils;
 using System;
@@ -23,11 +24,13 @@ namespace OPADotNet.Expressions
         private readonly Type _rootType;
         private readonly Expression _rootParameter;
         private readonly Dictionary<string, ParameterExpression> _parameters = new Dictionary<string, ParameterExpression>();
+        private readonly ILogger _logger;
 
-        public AstToExpressionVisitor(Expression parameterExpression, Type rootType)
+        public AstToExpressionVisitor(Expression parameterExpression, Type rootType, ILogger logger)
         {
             _rootType = rootType;
             _rootParameter = parameterExpression;
+            _logger = logger;
         }
 
         public override Expression VisitStringLiteral(StringLiteral stringLiteral)
@@ -73,9 +76,10 @@ namespace OPADotNet.Expressions
                     expr = Visit(queries.OrQueries[i]);
                     break;
                 }
-                catch 
+                catch(Exception e)
                 {
                     //On exceptions we go to the next query
+                    _logger.LogWarning(e, "Error converting an OR query, skipping it.");
                 }
             }
 
@@ -91,9 +95,10 @@ namespace OPADotNet.Expressions
                     var otherExpr = Visit(queries.OrQueries[i]);
                     expr = Expression.OrElse(expr, otherExpr);
                 }
-                catch
+                catch(Exception e)
                 {
                     //On exception skip the query
+                    _logger.LogWarning(e, "Error converting an OR query, skipping it.");
                 }
             }
 

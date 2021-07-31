@@ -14,11 +14,13 @@ namespace OPADotNet.AspNetCore.Requirements
     {
         private readonly PreparedPartialStore _preparedPartialStore;
         private readonly ILogger<OpaPolicyHandler> _logger;
+        private readonly ExpressionConverter _expressionConverter;
 
-        public OpaPolicyHandler(PreparedPartialStore preparedPartialStore, ILogger<OpaPolicyHandler> logger)
+        public OpaPolicyHandler(PreparedPartialStore preparedPartialStore, ExpressionConverter expressionConverter, ILogger<OpaPolicyHandler> logger)
         {
             _preparedPartialStore = preparedPartialStore;
             _logger = logger;
+            _expressionConverter = expressionConverter;
         }
 
         private OpaInput GetInput(AuthorizationHandlerContext context, OpaPolicyRequirement requirement)
@@ -48,7 +50,7 @@ namespace OPADotNet.AspNetCore.Requirements
                 return;
             }
 
-            var expr = await new ExpressionConverter().ToExpression(result, requirement.GetUnknown(), context.Resource.GetType());
+            var expr = await _expressionConverter.ToExpression(result, requirement.GetUnknown(), context.Resource.GetType());
 
             var func = expr.Compile();
 
@@ -73,7 +75,7 @@ namespace OPADotNet.AspNetCore.Requirements
                 return;
             }
 
-            var expression = await new ExpressionConverter().ToExpression(result, requirement.GetUnknown(), authorizeQueryableHolder.ParameterExpression);
+            var expression = await _expressionConverter.ToExpression(result, requirement.GetUnknown(), authorizeQueryableHolder.ParameterExpression);
             authorizeQueryableHolder.AddFilter(expression);
             context.Succeed(requirement);
         }
@@ -94,7 +96,7 @@ namespace OPADotNet.AspNetCore.Requirements
                 return;
             }
 
-            var expr = await new ExpressionConverter().ToExpression(result, requirement.GetUnknown(), holder.Data.GetType());
+            var expr = await _expressionConverter.ToExpression(result, requirement.GetUnknown(), holder.Data.GetType());
 
             var func = expr.Compile();
 
