@@ -70,7 +70,7 @@ namespace OPADotNet.Expressions.Ast.Conversion
                     i--;
                 }
             }
-            return base.VisitQueries(queries);
+            return queries;
         }
 
         public override Node VisitQuery(Query query)
@@ -79,6 +79,8 @@ namespace OPADotNet.Expressions.Ast.Conversion
             {
                 query.AndExpressions[i] = Visit(query.AndExpressions[i]) as BooleanExpression;
             }
+            //Merge all any expressions that have the same property and parameter name
+            MergeAnyExpressions(query.AndExpressions);
             //Reset the iterator name
             iteratorName = null;
             return query;
@@ -87,6 +89,47 @@ namespace OPADotNet.Expressions.Ast.Conversion
         private bool ContainsIterator(Reference reference)
         {
             return reference.References.Any(x => x is VariableReference it && it.IsIterator);
+        }
+
+        private void MergeAnyExpressions(IList<BooleanExpression> andExpressions)
+        {
+            Dictionary<string, AnyCall> existingAnyCalls = null;
+            bool mergedAny = false;
+            for (int i = 0; i < andExpressions.Count; i++)
+            {
+                if (andExpressions[i] is AnyCall anyCall)
+                {
+                    //Only allocate dictionary if an any call exists
+                    if (existingAnyCalls == null)
+                    {
+                        existingAnyCalls = new Dictionary<string, AnyCall>();
+                    }
+                    string key = $"{anyCall.Property.ToString()}->{anyCall.ParameterName}";
+                    if (existingAnyCalls.TryGetValue(key, out var existingAny))
+                    {
+                        //Add all the and expressions from the any call to the existing one
+                        existingAny.AndExpressions.AddRange(anyCall.AndExpressions);
+                        mergedAny = true;
+                        andExpressions.RemoveAt(i);
+                        i--;
+                    }
+                    else
+                    {
+                        existingAnyCalls.Add(key, anyCall);
+                    }
+                }
+            }
+            if (mergedAny)
+            {
+                //Second pass to merge the and expressions inside each any
+                for (int i = 0; i < andExpressions.Count; i++)
+                {
+                    if (andExpressions[i] is AnyCall anyCall)
+                    {
+                        MergeAnyExpressions(anyCall.AndExpressions);
+                    }
+                }
+            }
         }
 
         private Node ReplaceWithAny(BooleanComparisonExpression booleanComparisonExpression)
