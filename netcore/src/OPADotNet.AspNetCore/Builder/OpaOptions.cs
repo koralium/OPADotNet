@@ -11,20 +11,22 @@ namespace OPADotNet.AspNetCore.Builder
 
         public bool UseEmbedded { get; }
 
-        public IReadOnlyList<ISyncService> SyncServices { get; }
+        public SyncOptions SyncOptions { get; }
 
-        public IReadOnlyList<Type> SyncServiceTypes { get; }
+        //public IReadOnlyList<ISyncService> SyncServices { get; }
+
+        //public IReadOnlyList<Type> SyncServiceTypes { get; }
 
         public OpaOptions(
             Uri opaServer,
-            bool useEmbedded, 
-            IReadOnlyList<ISyncService> syncServices,
-            IReadOnlyList<Type> syncServiceTypes)
+            bool useEmbedded,
+            SyncOptions syncOptions)
+            //IReadOnlyList<ISyncService> syncServices,
+            //IReadOnlyList<Type> syncServiceTypes)
         {
             OpaServer = opaServer;
             UseEmbedded = useEmbedded;
-            SyncServices = syncServices;
-            SyncServiceTypes = syncServiceTypes;
+            SyncOptions = syncOptions;
         }
     }
 }

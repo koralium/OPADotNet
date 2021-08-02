@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using OPADotNet.AspNetCore.Builder;
 using OPADotNet.Ast.Models;
 using OPADotNet.Embedded;
+using OPADotNet.Embedded.Discovery;
 using OPADotNet.Embedded.sync;
 using OPADotNet.RestAPI;
 using System;
@@ -54,14 +55,20 @@ namespace OPADotNet.AspNetCore
                     });
                 }
 
-                SyncHandler syncHandler = new SyncHandler(
-                    embeddedClient, 
-                    _opaOptions.SyncServices.ToList(), 
-                    _opaOptions.SyncServiceTypes.ToList(), 
-                    syncPolicyDescriptors, 
-                    _serviceProvider);
+                DiscoveryHandler discoveryHandler = new DiscoveryHandler(
+                    syncPolicyDescriptors,
+                    _serviceProvider
+                    );
 
-                await syncHandler.Start();
+                await discoveryHandler.Start();
+
+                //SyncHandler syncHandler = new SyncHandler(
+                //    embeddedClient,
+                //    _opaOptions.SyncOptions,
+                //    syncPolicyDescriptors, 
+                //    _serviceProvider);
+
+                //await syncHandler.Start();
             }
 
             foreach(var requirement in requirements)

@@ -35,18 +35,20 @@ namespace MvcExample
             });
 
             //Add OPA
-            services.AddOpa(opt =>
-            {
-                // Add syncs here, such as syncing with an existing OPA server
-                // opt.OpaServerSync("opaServerUrl")
+            services.AddOpa(opt => 
+                //Add policy and data sync
+                opt.AddSync(s =>
+                    // Add syncs here, such as syncing with an existing OPA server
+                    //s.UseOpaServer("opaServerUrl")
 
-                // Add a local policy
-                opt.Local(local =>
-                {
-                    var policy = File.ReadAllText("policy.rego");
-                    local.AddPolicy(policy);
-                });
-            });
+                    //Add a local policy
+                    s.UseLocal(local =>
+                    {
+                        var policy = File.ReadAllText("policy.rego");
+                        local.AddPolicy(policy);
+                    })
+                )
+            );
 
             // Mocking a logged in user just for the sample
             services.AddAuthentication("BasicAuthentication")

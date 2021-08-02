@@ -8,9 +8,9 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class OpaBuilderExtensions
     {
-        public static OpaBuilder OpaServerSync(this OpaBuilder opaBuilder, string opaServerUrl, TimeSpan interval = default)
+        public static ISyncBuilder UseOpaServer(this ISyncBuilder syncBuilder, string opaServerUrl, TimeSpan interval = default)
         {
-            return opaBuilder.OpaServerSync(opt =>
+            return syncBuilder.UseOpaServer(opt =>
             {
                 opt.OpaServerUrl = opaServerUrl;
 
@@ -21,30 +21,30 @@ namespace Microsoft.Extensions.DependencyInjection
             });
         }
 
-        public static OpaBuilder OpaServerSync(this OpaBuilder opaBuilder, Action<OpaServerSyncOptions> options)
+        public static ISyncBuilder UseOpaServer(this ISyncBuilder syncBuilder, Action<OpaServerSyncOptions> options)
         {
             OpaServerSyncOptions opt = new OpaServerSyncOptions();
             options?.Invoke(opt);
 
-            opaBuilder.Services.AddSingleton(opt);
-            opaBuilder.AddSyncService<OpaServerSync>();
+            syncBuilder.Services.AddSingleton(opt);
+            syncBuilder.AddSyncService<OpaServerSync>();
 
-            return opaBuilder;
+            return syncBuilder;
         }
 
-        public static OpaBuilder Local(this OpaBuilder opaBuilder, Action<LocalSyncOptions> options)
+        public static ISyncBuilder UseLocal(this ISyncBuilder syncBuilder, Action<LocalSyncOptions> options)
         {
             LocalSyncOptions localSyncOptions = new LocalSyncOptions();
             options?.Invoke(localSyncOptions);
 
-            opaBuilder.Services.AddSingleton(localSyncOptions);
-            opaBuilder.AddSyncService<LocalSync>();
-            return opaBuilder;
+            syncBuilder.Services.AddSingleton(localSyncOptions);
+            syncBuilder.AddSyncService<LocalSync>();
+            return syncBuilder;
         }
 
-        public static OpaBuilder LoadLocalTarGz(this OpaBuilder opaBuilder, string filePath)
+        public static ISyncBuilder UseLocalTarGz(this ISyncBuilder syncBuilder, string filePath)
         {
-            return opaBuilder.AddSyncService(new LocalTarGzSync(filePath));
+            return syncBuilder.AddSyncService(new LocalTarGzSync(filePath));
         }
     }
 }

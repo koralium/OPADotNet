@@ -35,8 +35,8 @@ In startup.cs add the following:
 public void ConfigureServices(IServiceCollection services)
 {
     ...
-    //Add OPA and connects to an OPA server to get the policies and data required.
-    services.AddOpa(x => x.OpaServer("http://127.0.0.1:8181", TimeSpan.FromMinutes(5)));
+    //Add OPA and connects to an OPA server to sync the policies and data required.
+    services.AddOpa(x => x.OpaServerSync("http://127.0.0.1:8181", TimeSpan.FromMinutes(5)));
     services.AddAuthorization(opt =>
     {
         opt.AddPolicy("read", x => x.RequireOpaPolicy("testpolicy", "reports"));
@@ -47,7 +47,7 @@ public void ConfigureServices(IServiceCollection services)
 
 The following command:
 ```
-services.AddOpa(x => x.OpaServer("http://127.0.0.1:8181", TimeSpan.FromMinutes(5)));
+services.AddOpa(x => x.OpaServerSync("http://127.0.0.1:8181", TimeSpan.FromMinutes(5)));
 ```
 Adds a connection to an OPA server and begins syncing policies and the required data for the policies to the embedded OPA server. The second parameter sets a time span how often data and policies should be synced from the OPA server.
 
@@ -80,7 +80,7 @@ When any Authorize command is ran, the following constants are added to the inpu
 
 When doing a single resource authorization (not queryable), the following input is also added:
 
-* **input.{dataName}** - Data name is the name added in _RequireOpaPolicy_ this contains the resource. 
+* **input.resource** - This contains the resource that is being authorized. 
 
 ## Usage
 

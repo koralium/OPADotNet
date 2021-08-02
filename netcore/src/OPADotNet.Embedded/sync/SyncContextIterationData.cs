@@ -38,7 +38,7 @@ namespace OPADotNet.Embedded.sync
         /// <summary>
         /// Mark that the sync iteration is done, and the changes will be propagated to the embedded OPA server
         /// </summary>
-        public void Done()
+        public virtual void Done()
         {
             //Write the policies into the store
             foreach (var usedPolicy in _policies)
