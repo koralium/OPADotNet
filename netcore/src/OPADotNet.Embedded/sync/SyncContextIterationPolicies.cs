@@ -21,6 +21,8 @@ namespace OPADotNet.Embedded.sync
             _existingPolices = existingPolices;
         }
 
+        protected IEnumerable<Policy> AddedPolicies => _addedPolicies;
+
         /// <summary>
         /// Take in a raw policy and get a compiled policy with an AST tree.
         /// </summary>
@@ -45,7 +47,7 @@ namespace OPADotNet.Embedded.sync
         /// <summary>
         /// Move to the next step in the sync process
         /// </summary>
-        public SyncContextIterationData Next()
+        public virtual SyncContextIterationData Next()
         {
             var (usedPolicies, dataSets) = GetUsedPoliciesAndGetDataSets(_addedPolicies);
             var tree = DataSetTreeBuilder.BuildDataSetTree(dataSets);

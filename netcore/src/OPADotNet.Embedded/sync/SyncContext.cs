@@ -21,7 +21,7 @@ namespace OPADotNet.Embedded.sync
             _modules = modules;
         }
 
-        public SyncContextIterationPolicies NewIteration()
+        public virtual SyncContextIterationPolicies NewIteration()
         {
             return new SyncContextIterationPolicies(_opaClientEmbedded, _modules, _existingSyncPolicies);
         }

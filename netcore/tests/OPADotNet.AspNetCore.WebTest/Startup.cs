@@ -13,14 +13,14 @@ namespace OPADotNet.AspNetCore.WebTest
     public class Startup
     {
         private static string moduleData = @"
-package localpolicy
+        package localpolicy
 
-default allow = false
+        default allow = false
 
-allow {
-  input.identity = data.admin.name
-}
-";
+        allow {
+            input.identity = data.admin.name
+        }
+        ";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -28,13 +28,10 @@ allow {
         {
             services.AddControllers();
             //Add OPA and connects to an OPA server to get the policies and data required.
-            services.AddOpa(x => x
-                    .OpaServerSync("http://127.0.0.1:8181", TimeSpan.FromSeconds(10))
-                    .Local(opt =>
-                    {
-                        opt.AddPolicy(moduleData);
-                    })
-                );
+            services.AddOpa(x => x.AddSync(sync => sync
+                    .UseOpaServer("http://127.0.0.1:8181", TimeSpan.FromSeconds(10))
+                    .UseLocal(opt => opt.AddPolicy(moduleData))
+                ));
 
             services.AddAuthorization(opt =>
             {

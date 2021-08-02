@@ -33,6 +33,16 @@ namespace OPADotNet.Embedded
             }
         }
 
+        /// <summary>
+        /// Internal for now until the API is more understood
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        internal PreparedEvalEmbedded PrepareEvaluation(string query)
+        {
+            return new PreparedEvalEmbedded(OpaStore, query);
+        }
+
         public IPreparedPartial PreparePartial(string query)
         {
             var preparedPartial = new PreparedPartialEmbedded(OpaStore, query);

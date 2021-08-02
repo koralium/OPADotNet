@@ -11,8 +11,7 @@ namespace OPADotNet.AspNetCore.Builder
     {
         private string _opaServerUrl;
         private bool _useEmbedded = false;
-        private readonly List<ISyncService> _syncServices = new List<ISyncService>();
-        private readonly List<Type> _syncServiceTypes = new List<Type>();
+        private SyncOptions _syncOptions;
 
         internal OpaBuilder(IServiceCollection services)
         {
@@ -31,15 +30,16 @@ namespace OPADotNet.AspNetCore.Builder
             return this;
         }
 
-        public OpaBuilder AddSyncService<T>(T service) where T : ISyncService
+        public OpaBuilder AddSync(Action<ISyncBuilder> builder)
         {
-            _syncServices.Add(service);
-            return this;
-        }
+            if (_syncOptions != null)
+            {
+                throw new InvalidOperationException("AddSync can only be called once");
+            }
 
-        public OpaBuilder AddSyncService<T>() where T: ISyncService
-        {
-            _syncServiceTypes.Add(typeof(T));
+            SyncBuilder syncBuilder = new SyncBuilder(Services);
+            builder?.Invoke(syncBuilder);
+            _syncOptions = syncBuilder.Build();
             return this;
         }
 
@@ -67,7 +67,7 @@ namespace OPADotNet.AspNetCore.Builder
                 throw new InvalidOperationException("Cannot run both embedded mode and Opa server mode.");
             }
 
-            if (_opaServerUrl != null && (_syncServices.Count > 0 || _syncServiceTypes.Count > 0))
+            if (_opaServerUrl != null && (_syncOptions.SyncServices.Count > 0))
             {
                 throw new InvalidOperationException("Cannot run both policy and data sync with opa server mode.");
             }
@@ -75,7 +75,7 @@ namespace OPADotNet.AspNetCore.Builder
             //We always use embedded mode if OPA server is not entered.
             bool embeddedMode = _opaServerUrl == null;
 
-            return new OpaOptions(url, embeddedMode, _syncServices.ToList(), _syncServiceTypes.ToList());
+            return new OpaOptions(url, embeddedMode, _syncOptions);
         }
     }
 }
