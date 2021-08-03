@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RepositoryUrl>https://github.com/koralium/OPADotNet</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/koralium/OPADotNet</PackageProjectUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,6 +14,13 @@
   <ItemGroup>
     <ProjectReference Include="..\OPADotNet.Core\OPADotNet.Core.csproj" />
     <ProjectReference Include="..\OPADotNet.Embedded\OPADotNet.Embedded.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
