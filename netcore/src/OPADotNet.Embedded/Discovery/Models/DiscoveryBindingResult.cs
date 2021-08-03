@@ -9,5 +9,8 @@ namespace OPADotNet.Embedded.Models
     {
         [JsonPropertyName("bundles")]
         public Dictionary<string, DiscoveryBundle> Bundles { get; set; }
+
+        [JsonPropertyName("services")]
+        public Dictionary<string, DiscoveryServiceModel> Services { get; set; }
     }
 }

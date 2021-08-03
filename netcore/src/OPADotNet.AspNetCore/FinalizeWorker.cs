@@ -61,14 +61,6 @@ namespace OPADotNet.AspNetCore
                     );
 
                 await discoveryHandler.Start();
-
-                //SyncHandler syncHandler = new SyncHandler(
-                //    embeddedClient,
-                //    _opaOptions.SyncOptions,
-                //    syncPolicyDescriptors, 
-                //    _serviceProvider);
-
-                //await syncHandler.Start();
             }
 
             foreach(var requirement in requirements)

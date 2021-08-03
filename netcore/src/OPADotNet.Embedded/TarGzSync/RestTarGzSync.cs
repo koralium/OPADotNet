@@ -13,12 +13,10 @@ namespace OPADotNet.Embedded.Sync
     internal class RestTarGzSync : TarGzSync
     {
         private readonly RestTarGzOptions _options;
-        private readonly ILogger _logger;
 
-        public RestTarGzSync(RestTarGzOptions options, ILogger<RestTarGzSync> logger)
+        public RestTarGzSync(RestTarGzOptions options)
         {
             _options = options;
-            _logger = logger;
         }
 
         public override async Task BackgroundRun(SyncContext syncContext, CancellationToken cancellationToken)
@@ -32,7 +30,7 @@ namespace OPADotNet.Embedded.Sync
                 }
                 catch (Exception e)
                 {
-                    _logger.LogWarning(e, "Could not update policies and data from Rest tar.gz service.");
+                    //TODO: Add logging etc
                 }
             }
         }
@@ -40,7 +38,22 @@ namespace OPADotNet.Embedded.Sync
         public override async Task GetTarGzStream(Func<Stream, Task> addStream)
         {
             HttpClient httpClient = new HttpClient();
-            using var stream = await httpClient.GetStreamAsync(_options.Url);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, _options.Url);
+
+            foreach(var header in _options.Headers)
+            {
+                requestMessage.Headers.Add(header.Key, header.Value);
+            }
+
+            if (_options.CredentialMethod != null)
+            {
+                await _options.CredentialMethod.Apply(requestMessage);
+            }
+
+            var response = await httpClient.SendAsync(requestMessage);
+
+            using var stream = await response.Content.ReadAsStreamAsync();
             await addStream(stream);
         }
     }
