@@ -142,11 +142,22 @@ namespace OPADotNet.Embedded.Sync
             BeginLoad();
             TaskCompletionSource<Stream> getStreamTask = new TaskCompletionSource<Stream>();
             TaskCompletionSource<object> doneWithStreamTask = new TaskCompletionSource<object>();
-            var getTarGzStreamTask = GetTarGzStream(stream =>
+
+
+            Task getTarGzStreamTask = null;
+            getTarGzStreamTask = GetTarGzStream(stream =>
             {
                 getStreamTask.SetResult(stream);
                 return doneWithStreamTask.Task;
             });
+
+            //Wait for both tasks first, since an exception might be thrown
+            await Task.WhenAny(getStreamTask.Task, getTarGzStreamTask);
+
+            if (getTarGzStreamTask.IsFaulted)
+            {
+                throw getTarGzStreamTask.Exception;
+            }
 
             //Wait to get the stream
             var stream = await getStreamTask.Task;

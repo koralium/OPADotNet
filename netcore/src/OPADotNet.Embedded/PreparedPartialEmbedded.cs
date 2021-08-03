@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace OPADotNet.Embedded
 {
-    internal class PreparedPartialEmbedded : IPreparedPartial
+    internal class PreparedPartialEmbedded : IPreparedPartial, IPreparedEmbedded
     {
         private int _preparedQueryId;
         private bool disposedValue;
@@ -22,22 +22,7 @@ namespace OPADotNet.Embedded
         {
             _query = query;
             _opaStore = opaStore;
-            Update();
-        }
-
-        internal void Update()
-        {
-            if (_preparedQueryId > 0)
-            {
-                RegoWrapper.RemovePartialQuery(_preparedQueryId);
-            }
-            int result = RegoWrapper.PreparePartial(_opaStore.GetCompiler().compilerId, _opaStore._storeId, _query);
-
-            if (result < 0)
-            {
-                RegoWrapper.FreeString(result);
-            }
-            _preparedQueryId = result;
+            this.Update();
         }
 
         public Task<AstQueries> Partial(object input, IEnumerable<string> unknowns)
@@ -79,6 +64,21 @@ namespace OPADotNet.Embedded
         {
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        public void Update()
+        {
+            if (_preparedQueryId > 0)
+            {
+                RegoWrapper.RemovePartialQuery(_preparedQueryId);
+            }
+            int result = RegoWrapper.PreparePartial(_opaStore.GetCompiler().compilerId, _opaStore._storeId, _query);
+
+            if (result < 0)
+            {
+                RegoWrapper.FreeString(result);
+            }
+            _preparedQueryId = result;
         }
     }
 }

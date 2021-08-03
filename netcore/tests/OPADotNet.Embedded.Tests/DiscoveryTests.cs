@@ -1,31 +1,70 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using OPADotNet.Embedded.Discovery;
+using OPADotNet.Embedded.sync;
 using OPADotNet.Embedded.Sync;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using WireMock.RequestBuilders;
+using WireMock.ResponseBuilders;
+using WireMock.Server;
 
 namespace OPADotNet.Embedded.Tests
 {
     public class DiscoveryTests
     {
+        WireMockServer _server;
+        [SetUp]
+        public void StartMockServer()
+        {
+            _server = WireMockServer.Start();
+
+            var fileBytes = File.ReadAllBytes("test.tar.gz");
+            _server.Given(Request.Create().WithPath("/testing/test").WithHeader("x-ms-version", "2020-04-08").UsingGet())
+                .RespondWith(
+                    Response.Create().WithStatusCode(200)
+                    .WithBody(fileBytes).WithHeader("Content-Type", "application/octet-stream")
+                );
+        }
+
+        [TearDown]
+        public void ShutdownServer()
+        {
+            _server.Stop();
+        }
+
         [Test]
         public async Task TestDiscovery()
         {
             string configResult = @"
             {
-              ""bundles"": {
-                ""main"": {
-                  ""service"": ""acmecorp"",
-                  ""resource"": ""acmecorp/httpauthz""
+              ""services"": {
+                ""test"": {
+                  ""url"": """ + _server.Urls[0] + @""",
+                  ""headers"": {
+                    ""x-ms-version"": ""2020-04-08""
+                  }
                 }
               },
-              ""default_decision"": ""acmecorp/httpauthz/allow""
+              ""bundles"": {
+                ""main"": {
+                  ""service"": ""test"",
+                  ""resource"": ""testing/test"",
+                  ""polling"": {
+                    ""min_delay_seconds"": 30
+                  }
+                }
+              }
             }
             ";
+
             ServiceCollection services = new ServiceCollection();
+
+            var opaClientEmbedded = new OpaClientEmbedded();
+            services.AddSingleton(opaClientEmbedded);
 
             var localSyncOptions = new LocalSyncOptions()
                 .AddData("/", configResult);
@@ -33,10 +72,24 @@ namespace OPADotNet.Embedded.Tests
             SyncServiceHolder syncServiceHolder = new SyncServiceHolderObject(new LocalSync(localSyncOptions));
 
             services.AddSingleton(new DiscoveryOptions(syncServiceHolder, "data"));
+            services.AddSingleton(new SyncOptions(new List<SyncServiceHolder>()));
 
-            DiscoveryHandler discoveryHandler = new DiscoveryHandler(new List<sync.SyncPolicyDescriptor>(), services.BuildServiceProvider());
+            DiscoveryHandler discoveryHandler = new DiscoveryHandler(new List<SyncPolicyDescriptor>()
+            {
+                new SyncPolicyDescriptor()
+                {
+                    PolicyName = "example",
+                    Unknown = "reports"
+                }
+            }, services.BuildServiceProvider());
 
             await discoveryHandler.Start();
+
+            var readTxn = opaClientEmbedded.OpaStore.NewTransaction(false);
+            var rolesData = readTxn.Read("/roles/inner");
+            readTxn.Commit();
+
+            Assert.AreEqual("{\"identity\":\"test\"}", rolesData);
         }
     }
 }

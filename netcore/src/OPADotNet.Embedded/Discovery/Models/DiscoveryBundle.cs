@@ -12,5 +12,8 @@ namespace OPADotNet.Embedded.Models
 
         [JsonPropertyName("resource")]
         public string Resource { get; set; }
+
+        [JsonPropertyName("polling")]
+        public DiscoveryBundlePolling Polling { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OPADotNet.Embedded.sync
 {
@@ -38,7 +39,7 @@ namespace OPADotNet.Embedded.sync
         /// <summary>
         /// Mark that the sync iteration is done, and the changes will be propagated to the embedded OPA server
         /// </summary>
-        public virtual void Done()
+        public virtual Task Done()
         {
             //Write the policies into the store
             foreach (var usedPolicy in _policies)
@@ -48,6 +49,8 @@ namespace OPADotNet.Embedded.sync
 
             //Commit all the data changes and policies
             _opaTransaction.Commit();
+
+            return Task.CompletedTask;
         }
     }
 }

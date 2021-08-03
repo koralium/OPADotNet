@@ -8,7 +8,7 @@ namespace OPADotNet.Embedded
     public partial class OpaClientEmbedded : IOpaClient
     {
         private readonly OpaStore _opaStore;
-        private readonly List<WeakReference<PreparedPartialEmbedded>> _preparedPartials = new List<WeakReference<PreparedPartialEmbedded>>();
+        private readonly List<WeakReference<IPreparedEmbedded>> _prepared = new List<WeakReference<IPreparedEmbedded>>();
 
         public OpaClientEmbedded()
         {
@@ -19,15 +19,15 @@ namespace OPADotNet.Embedded
 
         internal void UpdatePrepared()
         {
-            for (int i = 0; i < _preparedPartials.Count; i++)
+            for (int i = 0; i < _prepared.Count; i++)
             {
-                if (_preparedPartials[i].TryGetTarget(out var target))
+                if (_prepared[i].TryGetTarget(out var target))
                 {
                     target.Update();
                 }
                 else
                 {
-                    _preparedPartials.RemoveAt(i);
+                    _prepared.RemoveAt(i);
                     i--;
                 }
             }
@@ -40,13 +40,15 @@ namespace OPADotNet.Embedded
         /// <returns></returns>
         internal PreparedEvalEmbedded PrepareEvaluation(string query)
         {
-            return new PreparedEvalEmbedded(OpaStore, query);
+            var preparedEval = new PreparedEvalEmbedded(OpaStore, query);
+            _prepared.Add(new WeakReference<IPreparedEmbedded>(preparedEval));
+            return preparedEval;
         }
 
         public IPreparedPartial PreparePartial(string query)
         {
             var preparedPartial = new PreparedPartialEmbedded(OpaStore, query);
-            _preparedPartials.Add(new WeakReference<PreparedPartialEmbedded>(preparedPartial));
+            _prepared.Add(new WeakReference<IPreparedEmbedded>(preparedPartial));
             return preparedPartial;
         }
     }

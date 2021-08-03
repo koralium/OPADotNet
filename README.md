@@ -36,10 +36,12 @@ public void ConfigureServices(IServiceCollection services)
 {
     ...
     //Add OPA and connects to an OPA server to sync the policies and data required.
-    services.AddOpa(x => x.OpaServerSync("http://127.0.0.1:8181", TimeSpan.FromMinutes(5)));
+    services.AddOpa(x => x.AddSync(sync => sync
+        .UseOpaServer("http://127.0.0.1:8181", TimeSpan.FromMinutes(5))
+    ));
     services.AddAuthorization(opt =>
     {
-        opt.AddPolicy("read", x => x.RequireOpaPolicy("testpolicy", "reports"));
+        opt.AddPolicy("read", x => x.RequireOpaPolicy("testpolicy", "reports", "GET"));
     });
     ...
 }
@@ -47,12 +49,14 @@ public void ConfigureServices(IServiceCollection services)
 
 The following command:
 ```
-services.AddOpa(x => x.OpaServerSync("http://127.0.0.1:8181", TimeSpan.FromMinutes(5)));
+services.AddOpa(x => x.AddSync(sync => sync
+        .UseOpaServer("http://127.0.0.1:8181", TimeSpan.FromMinutes(5))
+    ));
 ```
 Adds a connection to an OPA server and begins syncing policies and the required data for the policies to the embedded OPA server. The second parameter sets a time span how often data and policies should be synced from the OPA server.
 
 ```
-opt.AddPolicy("read", x => x.RequireOpaPolicy("testpolicy", "reports"));
+opt.AddPolicy("read", x => x.RequireOpaPolicy("testpolicy", "reports", "GET"));
 ```
 This command adds a aspnetcore policy that uses an OPA policy, the first parameter is which policy to use, this will be used and be translated into the following query:
 
@@ -68,6 +72,8 @@ This value is translated into two objects:
 
 When one does single resource authorization the input field will be set with the current resource.
 
+The third parameter is set to the input value "input.operation"
+
 ## Input constants
 
 When any Authorize command is ran, the following constants are added to the input:
@@ -77,6 +83,7 @@ When any Authorize command is ran, the following constants are added to the inpu
 * **input.subject.claims[]** - An array of the current user claims
 * **input.subject.claims[_].type** - The type that the claim is, for example "role".
 * **input.subject.claims[_].value** - The value of the claim.
+* **input.operation** - The operation name set when configuring the policy.
 
 When doing a single resource authorization (not queryable), the following input is also added:
 
@@ -108,7 +115,7 @@ allow {
 And the following AspNetCore policy:
 
 ```
-opt.AddPolicy("read", x => x.RequireOpaPolicy("testpolicy", "reports"));
+opt.AddPolicy("read", x => x.RequireOpaPolicy("testpolicy", "reports", "GET"));
 ```
 
 Then this is an example on where the current user can only see reports they are owner of:
