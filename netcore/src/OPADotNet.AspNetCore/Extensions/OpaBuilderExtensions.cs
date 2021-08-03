@@ -46,5 +46,13 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             return syncBuilder.AddSyncService(new LocalTarGzSync(filePath));
         }
+
+        public static ISyncBuilder UseHttpTarGz(this ISyncBuilder syncBuilder, Action<RestTarGzOptions> options)
+        {
+            RestTarGzOptions restTarGzOptions = new RestTarGzOptions();
+            options?.Invoke(restTarGzOptions);
+            syncBuilder.AddSyncService(new RestTarGzSync(restTarGzOptions));
+            return syncBuilder;
+        }
     }
 }

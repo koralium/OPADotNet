@@ -16,7 +16,7 @@ namespace OPADotNet.Embedded.sync
             await LoadPolices(policyStep, cancellationToken);
             var dataStep = policyStep.Next();
             await LoadData(dataStep, cancellationToken);
-            dataStep.Done();
+            await dataStep.Done();
         }
 
         public abstract Task LoadData(ISyncContextData syncContextData, CancellationToken cancellationToken);

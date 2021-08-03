@@ -36,7 +36,9 @@ namespace OPADotNet.AspNetCore.WebTest
             services.AddAuthorization(opt =>
             {
                 opt.AddPolicy("read", x => x.RequireOpaPolicy("example", "reports", "GET"));
-                opt.AddPolicy("test", x => x.RequireOpaPolicy("localpolicy", "testdata", "GET"));
+                opt.AddPolicy("test", x => x.RequireOpaPolicy("localpolicy", "testdata", "GET", opt =>
+                {
+                }));
             });
         }
 

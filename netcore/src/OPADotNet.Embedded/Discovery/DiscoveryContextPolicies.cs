@@ -8,10 +8,12 @@ namespace OPADotNet.Embedded.Discovery
     internal class DiscoveryContextPolicies : SyncContextIterationPolicies
     {
         private readonly OpaClientEmbedded _opaClientEmbedded;
+        private readonly DiscoveryHandler _discoveryHandler;
 
-        internal DiscoveryContextPolicies(OpaClientEmbedded opaClientEmbedded) : base(opaClientEmbedded, null, null)
+        internal DiscoveryContextPolicies(OpaClientEmbedded opaClientEmbedded, DiscoveryHandler discoveryHandler) : base(opaClientEmbedded, null, null)
         {
             _opaClientEmbedded = opaClientEmbedded;
+            _discoveryHandler = discoveryHandler;
         }
 
         public override SyncContextIterationData Next()
@@ -28,7 +30,7 @@ namespace OPADotNet.Embedded.Discovery
                 });
             }
 
-            return new DiscoveryContextData(_opaClientEmbedded, syncPolicies);
+            return new DiscoveryContextData(_opaClientEmbedded, syncPolicies, _discoveryHandler);
         }
     }
 }

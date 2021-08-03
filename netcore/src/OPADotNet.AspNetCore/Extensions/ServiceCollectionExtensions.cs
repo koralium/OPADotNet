@@ -23,7 +23,16 @@ namespace Microsoft.Extensions.DependencyInjection
             var opt = builder.Build();
 
             services.AddSingleton(opt);
-            services.AddSingleton(opt.SyncOptions);
+
+            if (opt.SyncOptions != null)
+            {
+                services.AddSingleton(opt.SyncOptions);
+            }
+            
+            if (opt.DiscoveryOptions != null)
+            {
+                services.AddSingleton(opt.DiscoveryOptions);
+            }
 
             RestOpaClient restOpaClient = null;
 
@@ -38,9 +47,12 @@ namespace Microsoft.Extensions.DependencyInjection
             }
             else if (opt.UseEmbedded)
             {
-                foreach(var syncServiceHolder in opt.SyncOptions.SyncServices)
+                if (opt.SyncOptions?.SyncServices != null)
                 {
-                    syncServiceHolder.AddToServices(services);
+                    foreach (var syncServiceHolder in opt.SyncOptions?.SyncServices)
+                    {
+                        syncServiceHolder.AddToServices(services);
+                    }
                 }
                 
                 var embeddedClient = new OpaClientEmbedded();

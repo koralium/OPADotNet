@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using OPADotNet.Embedded.Discovery;
 using OPADotNet.Embedded.sync;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace OPADotNet.AspNetCore.Builder
         private string _opaServerUrl;
         private bool _useEmbedded = false;
         private SyncOptions _syncOptions;
+        private DiscoveryOptions _discoveryOptions;
 
         internal OpaBuilder(IServiceCollection services)
         {
@@ -41,6 +43,21 @@ namespace OPADotNet.AspNetCore.Builder
             builder?.Invoke(syncBuilder);
             _syncOptions = syncBuilder.Build();
             return this;
+        }
+
+        public OpaBuilder AddDiscoverySync(Action<IDiscoverySyncBuilder> builder)
+        {
+            if (_discoveryOptions != null)
+            {
+                throw new InvalidOperationException("AddDiscoverySync can only be called once");
+            }
+
+            DiscoverySyncBuilder discoverySyncBuilder = new DiscoverySyncBuilder(Services);
+            builder?.Invoke(discoverySyncBuilder);
+            _discoveryOptions = discoverySyncBuilder.Build();
+            
+            return this;
+
         }
 
         /// <summary>
@@ -75,7 +92,7 @@ namespace OPADotNet.AspNetCore.Builder
             //We always use embedded mode if OPA server is not entered.
             bool embeddedMode = _opaServerUrl == null;
 
-            return new OpaOptions(url, embeddedMode, _syncOptions);
+            return new OpaOptions(url, embeddedMode, _syncOptions, _discoveryOptions);
         }
     }
 }

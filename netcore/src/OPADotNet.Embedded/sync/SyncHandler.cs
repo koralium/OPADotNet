@@ -35,12 +35,9 @@ namespace OPADotNet.Embedded.sync
         private readonly OpaClientEmbedded _opaClientEmbedded;
         private readonly SyncOptions _syncOptions;
         private readonly Dictionary<Guid, SyncContainer> _syncServices;
-       // private readonly List<ISyncService> _syncServices;
-        //private readonly List<Type> _syncServiceTypes;
         private readonly List<SyncPolicyDescriptor> _syncPolicyDescriptors;
         private readonly IServiceProvider _serviceProvider;
-
-        private readonly List<Task> _backgroundTasks = new List<Task>();
+        private SyncContext _syncContext;
 
         public SyncHandler(
             SyncOptions syncOptions,
@@ -52,9 +49,6 @@ namespace OPADotNet.Embedded.sync
             _syncOptions = syncOptions;
             _opaClientEmbedded = serviceProvider.GetService(typeof(OpaClientEmbedded)) as OpaClientEmbedded;
             _syncServices = new Dictionary<Guid, SyncContainer>();
-            //_syncServices = new List<ISyncService>();
-            //_syncServices = syncServices;
-            //_syncServiceTypes = syncServiceTypes;
             _syncPolicyDescriptors = syncPolicyDescriptors;
             _serviceProvider = serviceProvider;
         }
@@ -92,8 +86,7 @@ namespace OPADotNet.Embedded.sync
                     CancellationTokenSource = cancelToken,
                     Task = Task.Factory.StartNew(async () =>
                     {
-                        //TODO: Fix so the background run is started
-                        //await service.BackgroundRun(syncContext, cancelToken.Token);
+                        await service.BackgroundRun(_syncContext, cancelToken.Token);
                     }, TaskCreationOptions.LongRunning)
                     .Unwrap()
                 });
@@ -103,7 +96,7 @@ namespace OPADotNet.Embedded.sync
         public async Task Start()
         {
             var logger = _serviceProvider.GetService(typeof(ILogger<SyncHandler>)) as ILogger;
-            SyncContext syncContext = new SyncContext(_syncPolicyDescriptors, _opaClientEmbedded);
+            _syncContext = new SyncContext(_syncPolicyDescriptors, _opaClientEmbedded);
 
             foreach(var syncServiceHolder in _syncOptions.SyncServices)
             {
@@ -115,7 +108,7 @@ namespace OPADotNet.Embedded.sync
             }
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            var policyStep = syncContext.NewIteration();
+            var policyStep = _syncContext.NewIteration();
             foreach (var syncService in _syncServices)
             {
                 await syncService.Value.SyncService.LoadPolices(policyStep, cancellationTokenSource.Token);
@@ -128,7 +121,7 @@ namespace OPADotNet.Embedded.sync
                 await syncService.Value.SyncService.LoadData(dataStep, cancellationTokenSource.Token);
             }
 
-            dataStep.Done();
+            await dataStep.Done();
 
             foreach (var policy in _syncPolicyDescriptors)
             {
@@ -142,7 +135,7 @@ namespace OPADotNet.Embedded.sync
             {
                 var backgroundTask = Task.Factory.StartNew(async () =>
                 {
-                    await syncService.SyncService.BackgroundRun(syncContext, syncService.CancellationTokenSource.Token);
+                    await syncService.SyncService.BackgroundRun(_syncContext, syncService.CancellationTokenSource.Token);
                 }, TaskCreationOptions.LongRunning)
                     .Unwrap();
                 syncService.Task = backgroundTask;

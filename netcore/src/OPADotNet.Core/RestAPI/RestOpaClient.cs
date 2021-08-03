@@ -48,11 +48,8 @@ namespace OPADotNet.RestAPI
 
         public virtual async Task<string> GetDataJson(string path)
         {
-            var httpClient = new HttpClient();
-
-            var result = await httpClient.GetAsync(new Uri(_httpUrl, "/v1/data" + path));
-            var content = await result.Content.ReadAsStringAsync();
-            return content;
+            var jsonData = await GetData<JsonElement>(path);
+            return jsonData.GetRawText();
         }
 
         public virtual IPreparedPartial PreparePartial(string query)

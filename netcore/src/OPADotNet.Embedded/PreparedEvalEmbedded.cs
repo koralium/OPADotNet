@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OPADotNet.Embedded
 {
-    internal class PreparedEvalEmbedded : IDisposable
+    internal class PreparedEvalEmbedded : IDisposable, IPreparedEmbedded
     {
         private int _preparedEvalId;
         private bool disposedValue;
@@ -23,7 +23,7 @@ namespace OPADotNet.Embedded
             Update();
         }
 
-        internal void Update()
+        public void Update()
         {
             if (_preparedEvalId > 0)
             {

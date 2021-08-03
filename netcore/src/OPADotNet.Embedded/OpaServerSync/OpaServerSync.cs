@@ -49,7 +49,7 @@ namespace OPADotNet.Embedded.Sync
         private async Task GetDataSet(DataSetNode node, string path, ISyncContextData syncContext)
         {
             // If there is no more children or there is a child that is a variable, end there and get all the data
-            if (node.Children.Count == 0 || node.Children.Any(x => x.Value.IsVariable))
+            if (node.Children.Count == 0 || node.Children.Any(x => x.Value.IsVariable) || node.UsedInPolicy)
             {
                 //Fetch data
                 await GetData(path, syncContext);

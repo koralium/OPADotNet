@@ -12,5 +12,11 @@ namespace OPADotNet.Embedded.Models
 
         [JsonPropertyName("url")]
         public string Url { get; set; }
+
+        [JsonPropertyName("credentials")]
+        public DiscoveryServiceCredentials Credentials { get; set; }
+
+        [JsonPropertyName("headers")]
+        public Dictionary<string, string> Headers { get; set; }
     }
 }
