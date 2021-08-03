@@ -1,0 +1,75 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  publishNuget:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Extract tag name
+      id: tag
+      run: echo ::set-output name=VERSION::$(echo ${GITHUB_REF##*/v})
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.200
+    - name: Update project version
+      uses: roryprimrose/set-vs-sdk-project-version@v1
+      with:
+        version: ${{ steps.tag.outputs.VERSION }}
+    # Publish Core nuget
+    - name: publish on version change
+      id: publish_nuget_core
+      uses: rohith/publish-nuget@v2
+      with:
+        PROJECT_FILE_PATH: netcore/src/OPADotNet.Core/OPADotNet.Core.csproj
+        PACKAGE_NAME: OPADotNet.Core
+        NUGET_KEY: ${{ secrets.NUGET_KEY }}
+        TAG_COMMIT: false
+        VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
+    # Publish Embedded nuget
+    - name: publish on version change
+      id: publish_nuget_embedded
+      uses: rohith/publish-nuget@v2
+      with:
+        PROJECT_FILE_PATH: netcore/src/OPADotNet.Embedded/OPADotNet.Embedded.csproj
+        PACKAGE_NAME: OPADotNet.Embedded
+        NUGET_KEY: ${{ secrets.NUGET_KEY }}
+        TAG_COMMIT: false
+        VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
+    # Publish Expressions nuget
+    - name: publish on version change
+      id: publish_nuget_expressions
+      uses: rohith/publish-nuget@v2
+      with:
+        PROJECT_FILE_PATH: netcore/src/OPADotNet.Expressions/OPADotNet.Expressions.csproj
+        PACKAGE_NAME: OPADotNet.Expressions
+        NUGET_KEY: ${{ secrets.NUGET_KEY }}
+        TAG_COMMIT: false
+        VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
+    # Publish TestFramework nuget
+    - name: publish on version change
+      id: publish_nuget_testframework
+      uses: rohith/publish-nuget@v2
+      with:
+        PROJECT_FILE_PATH: netcore/src/OPADotNet.TestFramework/OPADotNet.TestFramework.csproj
+        PACKAGE_NAME: OPADotNet.TestFramework
+        NUGET_KEY: ${{ secrets.NUGET_KEY }}
+        TAG_COMMIT: false
+        VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
+    # Publish AspNetCore nuget
+    - name: publish on version change
+      id: publish_nuget_aspnetcore
+      uses: rohith/publish-nuget@v2
+      with:
+        PROJECT_FILE_PATH: netcore/src/OPADotNet.AspNetCore/OPADotNet.AspNetCore.csproj
+        PACKAGE_NAME: OPADotNet.AspNetCore
+        NUGET_KEY: ${{ secrets.NUGET_KEY }}
+        TAG_COMMIT: false
+        VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
+    
+    
