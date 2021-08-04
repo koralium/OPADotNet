@@ -37,14 +37,14 @@ namespace MvcExample.Controllers
         // GET: DataController
         public async Task<ActionResult> Index()
         {
-            var (authResult, data) = await _authorizationService.AuthorizeQueryable(User, _dataDbContext.Data, "read");
+            var authResult = await _authorizationService.AuthorizeQueryable(User, _dataDbContext.Data, "read");
 
             if (!authResult.Succeeded)
             {
                 return Forbid();
             }
 
-            return View(data);
+            return View(authResult.Queryable);
         }
 
         // GET: DataController/Details/5
