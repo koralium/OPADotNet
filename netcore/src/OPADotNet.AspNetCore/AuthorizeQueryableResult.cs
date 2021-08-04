@@ -16,7 +16,6 @@ namespace OPADotNet.AspNetCore
 
         internal AuthorizeQueryableResult(AuthorizationResult authorizationResult, IQueryable<T> queryable)
         {
-            //AuthorizationResult = authorizationResult;
             Queryable = queryable;
             Succeeded = authorizationResult.Succeeded;
             Failure = authorizationResult.Failure;
