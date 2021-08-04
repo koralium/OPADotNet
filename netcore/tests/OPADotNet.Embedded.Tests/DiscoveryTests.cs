@@ -12,6 +12,8 @@
  * limitations under the License.
  */
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using OPADotNet.Embedded.Discovery;
 using OPADotNet.Embedded.sync;
@@ -75,6 +77,7 @@ namespace OPADotNet.Embedded.Tests
             ";
 
             ServiceCollection services = new ServiceCollection();
+            services.AddLogging();
 
             var opaClientEmbedded = new OpaClientEmbedded();
             services.AddSingleton(opaClientEmbedded);
