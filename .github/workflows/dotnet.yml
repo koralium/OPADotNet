@@ -25,6 +25,8 @@ jobs:
       run: ./build_native_osx.ps1
       shell: pwsh
       if: ${{ matrix.os == 'macos-latest' }}
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      if: ${{ matrix.os == 'macos-latest' }}
     - name: Restore dependencies
       run: dotnet restore
       working-directory: netcore
