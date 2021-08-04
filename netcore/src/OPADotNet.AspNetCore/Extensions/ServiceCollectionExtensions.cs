@@ -74,7 +74,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.AddSingleton<IOpaClient>(x => x.GetRequiredService<OpaClientEmbedded>());
             }
 
-            services.AddHostedService<FinalizeWorker>();
+            services.AddHostedService<OpaWorker>();
 
             services.AddSingleton<IAuthorizationHandler, OpaPolicyHandler>();
 

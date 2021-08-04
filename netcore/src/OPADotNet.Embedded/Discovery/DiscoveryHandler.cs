@@ -151,6 +151,8 @@ namespace OPADotNet.Embedded.Discovery
 
         public async Task Start()
         {
+            _logger.LogTrace("Starting discovery handler");
+
             if (_discoveryOptions?.DiscoveryService != null)
             {
                 _discoverySyncService = _discoveryOptions.DiscoveryService.GetService(_serviceProvider);
