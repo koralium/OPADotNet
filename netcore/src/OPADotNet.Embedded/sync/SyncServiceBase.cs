@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,17 +20,27 @@ using System.Threading.Tasks;
 
 namespace OPADotNet.Embedded.sync
 {
-    public abstract class SyncServiceBase : ISyncService
+    public abstract class SyncServiceBase<TService> : ISyncService
     {
+        private ILogger _logger;
+
+        protected ILogger Logger => _logger;
+
         public abstract Task BackgroundRun(SyncContext syncContext, CancellationToken cancellationToken);
 
-        public async Task FullLoad(SyncContext syncContext, CancellationToken cancellationToken)
+        public virtual async Task FullLoad(SyncContext syncContext, CancellationToken cancellationToken)
         {
             var policyStep = syncContext.NewIteration();
             await LoadPolices(policyStep, cancellationToken);
             var dataStep = policyStep.Next();
             await LoadData(dataStep, cancellationToken);
             await dataStep.Done();
+        }
+
+        public virtual Task Initialize(IServiceProvider serviceProvider)
+        {
+            _logger = serviceProvider.GetService(typeof(ILogger<TService>)) as ILogger;
+            return Task.CompletedTask;
         }
 
         public abstract Task LoadData(ISyncContextData syncContextData, CancellationToken cancellationToken);

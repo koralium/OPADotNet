@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace OPADotNet.Embedded.Sync
 {
-    public abstract class TarGzSync : SyncServiceBase
+    public abstract class TarGzSync : SyncServiceBase<TarGzSync>
     {
         private const string TmpFileLocation = "tmp/tarSync.tar.gz";
 

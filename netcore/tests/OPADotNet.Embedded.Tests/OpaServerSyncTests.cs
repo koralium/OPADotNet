@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using OPADotNet.Embedded.sync;
 using OPADotNet.Embedded.Sync;
@@ -59,11 +60,16 @@ allow {
                 }
             }, opaClientEmbedded);
 
+            ServiceCollection services = new ServiceCollection();
+            services.AddLogging();
+            var provider = services.BuildServiceProvider();
+
             OpaServerSync opaServerSync = new OpaServerSync(new OpaServerSyncOptions()
             {
                 OpaServerUrl = "http://127.0.0.1:5020"
             }, null);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            await opaServerSync.Initialize(provider);
             await opaServerSync.FullLoad(syncContext, cancellationTokenSource.Token);
 
             var readTxn = opaClientEmbedded.OpaStore.NewTransaction(false);
