@@ -31,12 +31,16 @@
     <None Include="runtimes\win-x86\native\regosdk.dll" Visible="false" Pack="True" PackagePath="runtimes/win-x86/native" />
     <None Include="runtimes\linux-x86\native\regosdk.so" Visible="false" Pack="True" PackagePath="runtimes/linux-x86/native" />
     <None Include="runtimes\linux-x64\native\regosdk.so" Visible="false" Pack="True" PackagePath="runtimes/linux-x64/native" />
+    <None Include="runtimes\osx-x64\native\regosdk.dylib" Visible="false" Pack="True" PackagePath="runtimes/osx-x64/native" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(OS)|$(Platform)' == 'Windows_NT|AnyCPU' ">
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
     <None Include="runtimes\win-x64\native\regosdk.dll" Visible="false" CopyToOutputDirectory="PreserveNewest" Link="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(OS)|$(Platform)' == 'Unix|AnyCPU' ">
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
     <None Include="runtimes\linux-x64\native\regosdk.so" Visible="false" CopyToOutputDirectory="PreserveNewest" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <None Include="runtimes\osx-x64\native\regosdk.dylib" Visible="false" CopyToOutputDirectory="PreserveNewest" Link="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OPADotNet.Core\OPADotNet.Core.csproj" />
