@@ -96,6 +96,9 @@ namespace OPADotNet.Embedded.sync
         public async Task Start()
         {
             var logger = _serviceProvider.GetService(typeof(ILogger<SyncHandler>)) as ILogger;
+            logger.LogTrace("Starting SyncHandler");
+
+            logger.LogTrace("Configuring SyncContext");
             _syncContext = new SyncContext(_syncPolicyDescriptors, _opaClientEmbedded);
 
             foreach(var syncServiceHolder in _syncOptions.SyncServices)
@@ -108,7 +111,10 @@ namespace OPADotNet.Embedded.sync
             }
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
             var policyStep = _syncContext.NewIteration();
+
+            logger.LogTrace("Start loading policy data");
             foreach (var syncService in _syncServices)
             {
                 await syncService.Value.SyncService.LoadPolices(policyStep, cancellationTokenSource.Token);
@@ -116,6 +122,7 @@ namespace OPADotNet.Embedded.sync
 
             var dataStep = policyStep.Next();
 
+            logger.LogTrace("Start loading data");
             foreach (var syncService in _syncServices)
             {
                 await syncService.Value.SyncService.LoadData(dataStep, cancellationTokenSource.Token);
@@ -131,6 +138,7 @@ namespace OPADotNet.Embedded.sync
                 }
             }
 
+            logger.LogTrace("Starting background workers");
             foreach(var syncService in _syncServices.Values)
             {
                 var backgroundTask = Task.Factory.StartNew(async () =>
