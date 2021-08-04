@@ -89,7 +89,7 @@ namespace OPADotNet.Embedded.sync
             {
                 var toAddService = syncServices.FirstOrDefault(x => x.Id == toAdd);
                 var service = toAddService.GetService(_serviceProvider);
-
+                await service.Initialize(_serviceProvider);
                 var cancelToken = new CancellationTokenSource();
 
                 //Added services after start only start the background run.
@@ -116,9 +116,11 @@ namespace OPADotNet.Embedded.sync
 
             foreach(var syncServiceHolder in _syncOptions.SyncServices)
             {
+                var syncService = syncServiceHolder.GetService(_serviceProvider);
+                await syncService.Initialize(_serviceProvider);
                 _syncServices.Add(syncServiceHolder.Id, new SyncContainer()
                 {
-                    SyncService = syncServiceHolder.GetService(_serviceProvider),
+                    SyncService = syncService,
                     CancellationTokenSource = new CancellationTokenSource()
                 });
             }

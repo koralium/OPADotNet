@@ -21,6 +21,9 @@ namespace OPADotNet.Embedded.sync
 {
     public interface ISyncService
     {
+
+        Task Initialize(IServiceProvider serviceProvider);
+
         /// <summary>
         /// This function must load in all the data from the sync source, the task should return when the data is loaded.
         /// </summary>

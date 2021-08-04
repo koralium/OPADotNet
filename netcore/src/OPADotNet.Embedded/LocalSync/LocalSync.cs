@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace OPADotNet.Embedded.Sync
 {
-    internal class LocalSync : SyncServiceBase
+    internal class LocalSync : SyncServiceBase<LocalSync>
     {
         private readonly LocalSyncOptions _localSyncOptions;
         public LocalSync(LocalSyncOptions localSyncOptions)

@@ -16,6 +16,7 @@ using OPADotNet.Embedded.sync;
 using OPADotNet.RestAPI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -23,7 +24,7 @@ using System.Threading.Tasks;
 
 namespace OPADotNet.Embedded.Sync
 {
-    internal class OpaServerSync : SyncServiceBase
+    internal class OpaServerSync : SyncServiceBase<OpaServerSync>
     {
         private readonly OpaServerSyncOptions _opaServerSyncOptions;
         private readonly RestOpaClient _restOpaClient;
@@ -43,7 +44,12 @@ namespace OPADotNet.Embedded.Sync
                 try
                 {
                     await Task.Delay(_opaServerSyncOptions.Interval);
+
+                    using var loadActivity = new Activity("OpaServerSyncFullLoad");
+                    loadActivity.Start();
                     await FullLoad(syncContext, cancellationToken);
+                    loadActivity.Stop();
+                    _logger.LogTrace($"OPA Server sync done, elapsed time: {loadActivity.Duration.TotalMilliseconds}ms");
                 }
                 catch(Exception e)
                 {
@@ -89,16 +95,24 @@ namespace OPADotNet.Embedded.Sync
 
         public override async Task LoadPolices(ISyncContextPolicies syncContextPolicies, CancellationToken cancellationToken)
         {
+            using var loadPolicyActivity = new Activity("OpaServerLoadPolicies");
+            loadPolicyActivity.Start();
             var policies = await _restOpaClient.GetPolicies();
             syncContextPolicies.AddPolicies(policies);
+            loadPolicyActivity.Stop();
+            Logger.LogTrace($"Loaded OPA Server policies, elapsed time: {loadPolicyActivity.Duration.TotalMilliseconds}ms");
         }
 
         public override async Task LoadData(ISyncContextData syncContextData, CancellationToken cancellationToken)
         {
+            using var loadDataActivity = new Activity("OpaServerLoadData");
+            loadDataActivity.Start();
             foreach (var dataSet in syncContextData.DataSets)
             {
                 await GetDataSet(dataSet.Value, syncContextData);
             }
+            loadDataActivity.Stop();
+            Logger.LogTrace($"Loaded OPA Server data, elapsed time: {loadDataActivity.Duration.TotalMilliseconds}ms");
         }
     }
 }
