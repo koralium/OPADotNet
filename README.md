@@ -135,7 +135,7 @@ public class ValuesController : ControllerBase
   [HttpGet]
   public async Task<IActionResult> Get()
   {
-    var (authResult, filteredData) = await _authorizationService.AuthorizeQueryable(
+    var authResult = await _authorizationService.AuthorizeQueryable(
       HttpContext.User, 
       _dbContext.Reports, 
       "read");
@@ -145,7 +145,7 @@ public class ValuesController : ControllerBase
         return Unauthorized();
     }
 
-    return Ok(filteredData);
+    return Ok(authResult.Queryable);
   }
 }
 ```
