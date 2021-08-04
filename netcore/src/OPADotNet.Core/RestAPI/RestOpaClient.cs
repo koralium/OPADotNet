@@ -62,6 +62,12 @@ namespace OPADotNet.RestAPI
         public virtual async Task<string> GetDataJson(string path)
         {
             var jsonData = await GetData<JsonElement>(path);
+
+            if (jsonData.ValueKind == JsonValueKind.Undefined)
+            {
+                return "{}";
+            }
+
             return jsonData.GetRawText();
         }
 
