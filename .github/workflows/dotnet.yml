@@ -22,7 +22,8 @@ jobs:
       with:
         dotnet-version: 3.1.x
     - name: Build OSX Native
-      run: build_native_osx.ps1
+      run: ./build_native_osx.ps1
+      shell: pwsh
       if: ${{ matrix.os == 'macos-latest' }}
     - name: Restore dependencies
       run: dotnet restore
