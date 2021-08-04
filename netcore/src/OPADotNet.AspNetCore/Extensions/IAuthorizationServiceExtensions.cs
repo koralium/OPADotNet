@@ -32,16 +32,16 @@ namespace Microsoft.AspNetCore.Authorization
         /// <param name="authorizationService"></param>
         /// <param name="data">The queryable to filter</param>
         /// <returns></returns>
-        public static async Task<(AuthorizationResult AuthenticationResult, IQueryable<T> Data)> AuthorizeQueryable<T>(this IAuthorizationService authorizationService,ClaimsPrincipal user, IQueryable<T> data, string policyName)
+        public static async Task<AuthorizeQueryableResult<T>> AuthorizeQueryable<T>(this IAuthorizationService authorizationService,ClaimsPrincipal user, IQueryable<T> data, string policyName)
         {
             var (authResult, filter) = await GetOpaFilterExpression<T>(authorizationService, user, policyName);
 
             if (authResult.Succeeded)
             {
-                return (authResult, data.Where(filter));
+                return new AuthorizeQueryableResult<T>(authResult, data.Where(filter));
             }
 
-            return (authResult, Enumerable.Empty<T>().AsQueryable());
+            return new AuthorizeQueryableResult<T>(authResult, Enumerable.Empty<T>().AsQueryable());
         }
 
         public static async Task<AuthorizationResult> AuthorizeAsync(this IAuthorizationService authorizationService, ClaimsPrincipal user, object inputResource, object dataObject, string policyName)
