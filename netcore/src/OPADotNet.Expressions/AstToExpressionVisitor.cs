@@ -61,6 +61,11 @@ namespace OPADotNet.Expressions
             return Expression.Constant(boolLiteral.Value);
         }
 
+        public override Expression VisitNullLiteral(NullLiteral nullLiteral)
+        {
+            return Expression.Constant(null);
+        }
+
         public override Expression VisitQuery(Query query)
         {
             if (query.AndExpressions.Count == 0)
@@ -156,6 +161,10 @@ namespace OPADotNet.Expressions
 
         private Expression GetMember(Reference reference)
         {
+            if (reference.References.Count == 0)
+            {
+                return _rootParameter;
+            }
             if (reference.References.FirstOrDefault()?.Type == ReferenceType.Parameter)
             {
                 if (!_parameters.TryGetValue(reference.References.First().Value, out var parameter))
