@@ -104,5 +104,10 @@ namespace OPADotNet.Expressions.Ast
         {
             return default;
         }
+
+        public virtual T VisitNullLiteral(NullLiteral nullLiteral)
+        {
+            return default;
+        }
     }
 }
