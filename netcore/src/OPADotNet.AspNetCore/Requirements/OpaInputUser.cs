@@ -32,7 +32,7 @@ namespace OPADotNet.AspNetCore.Requirements
 
         public static OpaInputUser FromPrincipal(ClaimsPrincipal claimsPrincipal)
         {
-            if (!claimsPrincipal.Identity.IsAuthenticated)
+            if (!claimsPrincipal?.Identity?.IsAuthenticated ?? true)
             {
                 return null;
             }
