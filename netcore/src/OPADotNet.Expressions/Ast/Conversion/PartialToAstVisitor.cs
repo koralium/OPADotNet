@@ -63,7 +63,7 @@ namespace OPADotNet.Expressions.Ast
 
                 if (expression == null)
                 {
-                    throw new InvalidOperationException("Could not find a boolean expression in expression number: " + i);
+                    continue;
                 }
 
                 booleanExpressions.Add(expression);
@@ -77,6 +77,22 @@ namespace OPADotNet.Expressions.Ast
 
         public override Node VisitExpression(AstExpression partialExpression)
         {
+            if (partialExpression.Terms.Count == 1 && partialExpression.Terms[0].Type == AstTermType.Var)
+            {
+                return null;
+            }
+            if (partialExpression.Terms.Count == 1 && partialExpression.Terms[0].Type == AstTermType.Ref)
+            {
+                var leftScalar = scalarExpressionConverter.Visit(partialExpression.Terms[0]);
+
+                //Check that the reference is not equal to null
+                return new BooleanComparisonExpression()
+                {
+                    Type = BooleanComparisonType.NotEqualTo,
+                    Left = leftScalar,
+                    Right = NullLiteral.Defult
+                };
+            }
             if (partialExpression.Terms.Count != 3)
             {
                 throw new InvalidOperationException("Expressions can only be created if the expression terms are of length 3.");
