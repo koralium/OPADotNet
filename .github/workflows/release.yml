@@ -71,5 +71,16 @@ jobs:
         NUGET_KEY: ${{ secrets.NUGET_KEY }}
         TAG_COMMIT: false
         VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
+    # Publish Automapper nuget
+    - name: publish on version change
+      id: publish_nuget_automapper
+      uses: rohith/publish-nuget@v2
+      with:
+        PROJECT_FILE_PATH: netcore/src/OPADotNet.Automapper/OPADotNet.Automapper.csproj
+        PACKAGE_NAME: OPADotNet.Automapper
+        NUGET_KEY: ${{ secrets.NUGET_KEY }}
+        TAG_COMMIT: false
+        VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
+    
     
     
