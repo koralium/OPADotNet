@@ -65,5 +65,18 @@ namespace Microsoft.AspNetCore.Authorization
             var authorizeResult = await authorizationService.AuthorizeAsync(user, holder, policyName);
             return (authorizeResult, holder.GetLambdaExpression() as Expression<Func<T, bool>>);
         }
+
+        public static Task<(AuthorizationResult AuthenticationResult, LambdaExpression)> GetOpaFilterExpression(this IAuthorizationService authorizationService, ClaimsPrincipal user, string policyName, Type objectType)
+        {
+            return authorizationService.GetOpaFilterExpression(user, policyName, Expression.Parameter(objectType));
+        }
+
+        public static async Task<(AuthorizationResult AuthenticationResult, LambdaExpression)> GetOpaFilterExpression(this IAuthorizationService authorizationService, ClaimsPrincipal user, string policyName, ParameterExpression parameterExpression)
+        {
+            var holder = new AuthorizeQueryableHolder(parameterExpression.Type, parameterExpression);
+
+            var authorizeResult = await authorizationService.AuthorizeAsync(user, holder, policyName);
+            return (authorizeResult, holder.GetLambdaExpression());
+        }
     }
 }
