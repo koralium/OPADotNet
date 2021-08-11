@@ -3,7 +3,9 @@
   <h1 align="center">OPADotNet.AspNetCore</h1>
 
   <p align="center">
-    AspNetCore OPA framework to use opa policies in your API's.
+    AspNetCore OPA framework to use OPA policies in your API's.
+  <br />
+    <a href="https://opadotnet.readthedocs.io/en/latest/"><strong>Explore the docs »</strong></a>
 </p>
 
 
