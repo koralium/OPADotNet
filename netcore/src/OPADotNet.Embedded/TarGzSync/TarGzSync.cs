@@ -38,8 +38,8 @@ namespace OPADotNet.Embedded.Sync
                 throw new InvalidOperationException("Cannot begin a new sync with tar.gz when another one is already running.");
             }
 
-            var tmpFileName = Path.GetTempFileName();
-            FileStream outStream = new FileStream(tmpFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.DeleteOnClose);
+            var tmpFileName = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            FileStream outStream = new FileStream(tmpFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.DeleteOnClose);
 
             temporaryFileStream = outStream;
         }
