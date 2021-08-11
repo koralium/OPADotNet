@@ -1,0 +1,46 @@
+name: .NET
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.101
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '11' # The JDK version to make available on the path.
+        java-package: jdk # (jre, jdk, or jdk+fx) - defaults to jdk
+        architecture: x64 # (x64 or x86) - defaults to x64
+    - name: Install sonarscanner
+      run: dotnet tool install --tool-path . dotnet-sonarscanner --version 4.10.0
+      working-directory: netcore
+    - name: Start sonarscanner
+      working-directory: netcore
+      run: ./dotnet-sonarscanner begin /k:"koralium_netcore" /d:sonar.cpd.exclusions="**/AnonType.cs" /d:sonar.branch.name="${GITHUB_REF#refs/heads/}" /o:"koralium" /d:sonar.login="$SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    - name: Install dependencies
+      run: dotnet restore
+      working-directory: netcore
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      working-directory: netcore
+    - name: Test
+      run: dotnet test --no-restore --collect:"XPlat Code Coverage" --settings coverlet.runsettings
+      working-directory: netcore
+    - name: End sonarscanner
+      run: ./dotnet-sonarscanner end /d:sonar.login="$SONAR_TOKEN"
+      working-directory: netcore
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
