@@ -12,4 +12,5 @@ Welcome to OPADotNet's documentation!
 
    gettingstarted
    inputvalues
+   remotedata
    automapper
