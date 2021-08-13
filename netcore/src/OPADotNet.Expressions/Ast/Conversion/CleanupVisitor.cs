@@ -37,6 +37,9 @@ namespace OPADotNet.Expressions.Ast.Conversion
 
         private bool RemoveRootUnknown(Reference reference)
         {
+            if (_rootUnknown == null)
+                return false;
+
             if (reference.References.Count >= 2 &&
                 $"{reference.References[0].Value}.{reference.References[1].Value}" == _rootUnknown)
             {

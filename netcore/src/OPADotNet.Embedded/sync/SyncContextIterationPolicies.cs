@@ -87,7 +87,12 @@ namespace OPADotNet.Embedded.sync
                 }
                 module.Found = true; //Mark the policy as found
                 var referencedDataSets = FindDataSets(syncPolicy, referencedPolicies, syncPolicies);
-                referencedDataSets.RemoveWhere(x => x.StartsWith(module.Unknown)); //Remove the unknown from the referenced datasets
+
+                if (module.Unknown != null)
+                {
+                    referencedDataSets.RemoveWhere(x => x.StartsWith(module.Unknown)); //Remove the unknown from the referenced datasets
+                }
+                
                 dataSets.UnionWith(referencedDataSets);
             }
 

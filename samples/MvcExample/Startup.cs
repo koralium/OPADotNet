@@ -71,8 +71,12 @@ namespace MvcExample
                     //Add a local policy
                     s.UseLocal(local =>
                     {
-                        var policy = File.ReadAllText("policy.rego");
-                        local.AddPolicy(policy);
+                        var policyFiles = Directory.GetFiles("policies");
+                        foreach(var file in policyFiles)
+                        {
+                            var policy = File.ReadAllText(file);
+                            local.AddPolicy(policy);
+                        }
                     })
                 )
             );
@@ -85,12 +89,12 @@ namespace MvcExample
             services.AddAuthorization(opt =>
             {
                 // Add policies, and require the OPA policy, the policy is defined in policy.rego
-                opt.AddPolicy("read", x => x.RequireOpaPolicy("mvcexample", "securedata", "GET"));
-                opt.AddPolicy("create", x => x.RequireOpaPolicy("mvcexample", "securedata", "POST"));
-                opt.AddPolicy("update", x => x.RequireOpaPolicy("mvcexample", "securedata", "PUT"));
-                opt.AddPolicy("can_edit", x => x.RequireOpaPolicy("mvcexample", "securedata", "CAN_EDIT"));
-                opt.AddPolicy("delete", x => x.RequireOpaPolicy("mvcexample", "securedata", "DELETE"));
-                opt.AddPolicy("can_delete", x => x.RequireOpaPolicy("mvcexample", "securedata", "CAN_DELETE"));
+                opt.AddPolicy("read", x => x.RequireOpaPolicy("mvcexample.read", "securedata"));
+                opt.AddPolicy("create", x => x.RequireOpaPolicy("mvcexample.create", "securedata"));
+                opt.AddPolicy("update", x => x.RequireOpaPolicy("mvcexample.update", "securedata"));
+                opt.AddPolicy("can_edit", x => x.RequireOpaPolicy("mvcexample.can_edit", "securedata"));
+                opt.AddPolicy("delete", x => x.RequireOpaPolicy("mvcexample.delete", "securedata"));
+                opt.AddPolicy("can_delete", x => x.RequireOpaPolicy("mvcexample.can_delete", "securedata"));
             });
         }
 
