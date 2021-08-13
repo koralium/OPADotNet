@@ -52,7 +52,7 @@ namespace MvcExample
             services.AddAutoMapper(opt =>
             {
                 opt.CreateMap<DataModel, ViewModel>(MemberList.Destination)
-                    .ForMember(x => x.Permissions, opt => opt.MapFrom(src => src));
+                    .ForMember(x => x.Permissions, opt => opt.MapFromSourceObject());
 
                 opt.CreateMap<DataModel, Permissions>()
                     .ForMember(x => x.CanEdit, opt => opt.MapFromPolicy("can_edit"))

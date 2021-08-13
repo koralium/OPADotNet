@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using OPADotNet.Automapper;
+using OPADotNet.Automapper.Internal;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,6 +18,18 @@ namespace AutoMapper
         private static bool FromPolicyBasedOnDestination(string name)
         {
             return false;
+        }
+
+        /// <summary>
+        /// Equivalent to writing MapFrom(src => src);
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TDestination"></typeparam>
+        /// <typeparam name="TMember"></typeparam>
+        /// <param name="memberConfigurationExpression"></param>
+        public static void MapFromSourceObject<TSource, TDestination, TMember>(this IMemberConfigurationExpression<TSource, TDestination, TMember> memberConfigurationExpression)
+        {
+            memberConfigurationExpression.MapFrom(x => x);
         }
 
         public static void MapFromPolicy<TSource, TDestination>(this IMemberConfigurationExpression<TSource, TDestination, bool> memberConfigurationExpression, string policyName)
