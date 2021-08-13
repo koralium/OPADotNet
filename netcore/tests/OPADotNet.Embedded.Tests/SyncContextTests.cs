@@ -104,8 +104,7 @@ user_is_admin {
                 },
                 new SyncPolicyDescriptor()
                 {
-                    PolicyName = "rbac",
-                    Unknown = "not-used"
+                    PolicyName = "rbac"
                 }
             }, opaClientEmbedded);
 

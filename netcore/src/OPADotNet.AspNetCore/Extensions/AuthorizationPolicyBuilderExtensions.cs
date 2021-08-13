@@ -30,7 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="dataName">Name of the unknown data.</param>
         /// <param name="operation">Operation, this will be available in input.operation</param>
         /// <returns></returns>
-        public static AuthorizationPolicyBuilder RequireOpaPolicy(this AuthorizationPolicyBuilder authorizationPolicyBuilder, string policyName, string dataName, string operation, Action<OpaPolicyRequirementOptions> options = null)
+        public static AuthorizationPolicyBuilder RequireOpaPolicy(this AuthorizationPolicyBuilder authorizationPolicyBuilder, string policyName, string dataName = null, string operation = null, Action<OpaPolicyRequirementOptions> options = null)
         {
             OpaPolicyRequirementOptions opaPolicyRequirementOptions = new OpaPolicyRequirementOptions();
             options?.Invoke(opaPolicyRequirementOptions);

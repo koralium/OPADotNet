@@ -80,6 +80,7 @@ namespace OPADotNet.AspNetCore.Requirements
             opaInputRequest.Path = _httpContextAccessor.HttpContext.Request.Path.Value?.Split('/').Where(x => !string.IsNullOrEmpty(x)).ToList() ?? new List<string>();
             opaInputRequest.RouteValues = _httpContextAccessor.HttpContext.Request.RouteValues;
             opaInputRequest.Query = _httpContextAccessor.HttpContext.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToList());
+            opaInputRequest.Method = _httpContextAccessor.HttpContext.Request.Method;
 
             opaInput.Request = opaInputRequest;
 
@@ -93,10 +94,7 @@ namespace OPADotNet.AspNetCore.Requirements
             input.Extensions.Add(requirement.GetInputResourceName(), context.Resource);
 
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
-            var result = await preparedPartial.Partial(input, new List<string>()
-            {
-                requirement.GetUnknown()
-            });
+            var result = await preparedPartial.Partial(input, requirement.GetUnknowns());
 
             if (result.Queries == null)
             {
@@ -118,10 +116,7 @@ namespace OPADotNet.AspNetCore.Requirements
             var input = GetInput(context, requirement);
 
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
-            var result = await preparedPartial.Partial(input, new List<string>()
-            {
-                requirement.GetUnknown()
-            });
+            var result = await preparedPartial.Partial(input, requirement.GetUnknowns());
 
             if (result.Queries == null)
             {
@@ -139,10 +134,7 @@ namespace OPADotNet.AspNetCore.Requirements
             input.Extensions.Add(requirement.GetInputResourceName(), holder.Resource);
 
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
-            var result = await preparedPartial.Partial(input, new List<string>()
-            {
-                requirement.GetUnknown()
-            });
+            var result = await preparedPartial.Partial(input, requirement.GetUnknowns());
 
             if (result.Queries == null)
             {
@@ -164,10 +156,7 @@ namespace OPADotNet.AspNetCore.Requirements
             var input = GetInput(context, requirement);
 
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
-            var result = await preparedPartial.Partial(input, new List<string>()
-            {
-                requirement.GetUnknown()
-            });
+            var result = await preparedPartial.Partial(input, requirement.GetUnknowns());
 
             if (result.Queries != null)
             {

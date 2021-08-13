@@ -8,4 +8,5 @@ input.request; Contains an object with information of the current http request
 input.request.path[]; Contains an array of the url path which is split by '/', example: "test/testing" becomes ["test", "testing"]
 input.request.routeValues[]; A key value set that contains routing values
 input.request.query[]; A key value set that contains query variables in the url.
+input.request.method; The http method used in the request, GET, POST, etc.
 input.resource; On single resource authorization, this contains the resource that is being authorized.

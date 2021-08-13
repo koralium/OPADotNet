@@ -20,6 +20,8 @@ namespace OPADotNet.AspNetCore.Requirements
 {
     internal class OpaPolicyRequirement : IAuthorizationRequirement
     {
+        private readonly List<string> _unknowns;
+        private readonly string _unknown;
         private readonly OpaPolicyRequirementOptions _options;
 
         public string ModuleName { get; }
@@ -42,7 +44,7 @@ namespace OPADotNet.AspNetCore.Requirements
             return name;
         }
 
-        public string GetQuery()
+        internal string GetQuery()
         {
             if (_options.CustomQuery != null)
             {
@@ -52,16 +54,30 @@ namespace OPADotNet.AspNetCore.Requirements
             return $"{policyName}.allow == true";
         }
 
-        public string GetUnknown()
+        internal List<string> GetUnknowns()
+        {
+            return _unknowns;
+        }
+
+        internal string GetUnknown()
+        {
+            return _unknown;
+        }
+
+        private string GetUnknownValue()
         {
             if(_options.CustomUnknown != null)
             {
                 return _options.CustomUnknown;
             }
+            if (DataName == null)
+            {
+                return null;
+            }
             return PrependData(DataName);
         }
 
-        public string GetInputResourceName()
+        internal string GetInputResourceName()
         {
             return _options.InputResourceName;
         }
@@ -72,6 +88,17 @@ namespace OPADotNet.AspNetCore.Requirements
             DataName = dataName;
             Operation = operation;
             _options = options;
+
+            _unknown = GetUnknownValue();
+
+            if (_unknown == null)
+            {
+                _unknowns = new List<string>();
+            }
+            else
+            {
+                _unknowns = new List<string>() { _unknown };
+            }
         }
     }
 }

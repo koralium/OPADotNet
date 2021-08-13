@@ -15,5 +15,8 @@ namespace OPADotNet.AspNetCore.Input
 
         [JsonPropertyName("query")]
         public Dictionary<string, List<string>> Query { get; set; }
+
+        [JsonPropertyName("method")]
+        public string Method { get; set; }
     }
 }
