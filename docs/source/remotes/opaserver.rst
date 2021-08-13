@@ -14,6 +14,8 @@ This is done by setting the following configuration:
 
 When using a remote OPA server, the other configurations such as syncs, discovery etc will not work since they require the embedded OPA.
 
+.. _externalindev:
+
 External OPA Server in development
 -----------------------------------
 
