@@ -20,7 +20,7 @@ Reference architecture
 ------------------------
 
 Having an OPA server as a central store for policies and data allows a single place to contain your microservices policies and data. It also allows to easily switch between externally evaluating policies and
-using the embedded mode. For instance external evaluation can be used during development, while embedded mode is used in production for better performance.
+using the embedded mode. For instance external evaluation can be used during development, while embedded mode is used in production for better performance, see :ref:`externalindev`.
 This can look as follows:
 
 .. image:: diagrams/opaserversync.png
