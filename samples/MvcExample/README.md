@@ -8,3 +8,6 @@ Important classes are:
 * Startup.cs
 * Controllers/DataController.cs
 * policy.rego
+
+The sample also shows how to use the AutoMapper support to get a permissions object on each resource.
+This can be viewed in Startup on how to configure, and in DataController under the Index method.

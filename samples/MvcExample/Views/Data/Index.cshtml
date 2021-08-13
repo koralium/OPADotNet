@@ -1,4 +1,4 @@
-﻿@model IEnumerable<MvcExample.Models.DataModel>
+﻿@model IEnumerable<MvcExample.Models.ViewModel>
 
 @{
     ViewData["Title"] = "View";
@@ -37,9 +37,9 @@
                 @Html.DisplayFor(modelItem => item.Owner)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.Name }) |
+                @if (item.Permissions.CanEdit)  @Html.ActionLink("Edit", "Edit", new { id = item.Name }) |
                 @Html.ActionLink("Details", "Details", new { id = item.Name }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.Name })
+                @if (item.Permissions.CanDelete) @Html.ActionLink("Delete", "Delete", new { id = item.Name })
             </td>
         </tr>
 }

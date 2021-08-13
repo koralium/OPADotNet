@@ -25,6 +25,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using MvcExample.Models;
+using AutoMapper;
 
 namespace MvcExample
 {
@@ -47,10 +49,22 @@ namespace MvcExample
                 opt.UseInMemoryDatabase("database");
             });
 
+            services.AddAutoMapper(opt =>
+            {
+                opt.CreateMap<DataModel, ViewModel>(MemberList.Destination)
+                    .ForMember(x => x.Permissions, opt => opt.MapFrom(src => src));
+
+                opt.CreateMap<DataModel, Permissions>()
+                    .ForMember(x => x.CanEdit, opt => opt.MapFromPolicy("can_edit"))
+                    .ForMember(x => x.CanDelete, opt => opt.MapFromPolicy("can_delete"));
+            });
+
             //Add OPA
-            services.AddOpa(opt => 
+            services.AddOpa(opt =>
+                // Add automapper support
+                opt.AddAutomapperSupport()
                 //Add policy and data sync
-                opt.AddSync(s =>
+                .AddSync(s =>
                     // Add syncs here, such as syncing with an existing OPA server
                     //s.UseOpaServer("opaServerUrl")
 
@@ -74,7 +88,9 @@ namespace MvcExample
                 opt.AddPolicy("read", x => x.RequireOpaPolicy("mvcexample", "securedata", "GET"));
                 opt.AddPolicy("create", x => x.RequireOpaPolicy("mvcexample", "securedata", "POST"));
                 opt.AddPolicy("update", x => x.RequireOpaPolicy("mvcexample", "securedata", "PUT"));
+                opt.AddPolicy("can_edit", x => x.RequireOpaPolicy("mvcexample", "securedata", "CAN_EDIT"));
                 opt.AddPolicy("delete", x => x.RequireOpaPolicy("mvcexample", "securedata", "DELETE"));
+                opt.AddPolicy("can_delete", x => x.RequireOpaPolicy("mvcexample", "securedata", "CAN_DELETE"));
             });
         }
 
