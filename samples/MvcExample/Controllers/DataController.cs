@@ -117,8 +117,7 @@ namespace MvcExample.Controllers
                 return NotFound();
             }
 
-            //We mock an API with mvc just for some front end, so we just check read permissions
-            var authResult = await _authorizationService.AuthorizeAsync(User, resource, "read");
+            var authResult = await _authorizationService.AuthorizeAsync(User, resource, "can_edit");
 
             if (!authResult.Succeeded)
             {
@@ -173,8 +172,7 @@ namespace MvcExample.Controllers
                 return NotFound();
             }
 
-            //We mock an API with mvc just for some front end, so we just check read permissions
-            var authResult = await _authorizationService.AuthorizeAsync(User, resource, "read");
+            var authResult = await _authorizationService.AuthorizeAsync(User, resource, "can_delete");
 
             if (!authResult.Succeeded)
             {
