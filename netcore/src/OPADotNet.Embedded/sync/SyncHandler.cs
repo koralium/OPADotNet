@@ -46,25 +46,41 @@ namespace OPADotNet.Embedded.sync
         }
 
         private readonly OpaClientEmbedded _opaClientEmbedded;
-        private readonly SyncOptions _syncOptions;
         private readonly Dictionary<Guid, SyncContainer> _syncServices;
         private readonly List<SyncPolicyDescriptor> _syncPolicyDescriptors;
         private readonly IServiceProvider _serviceProvider;
         private SyncContext _syncContext;
+        private readonly ILogger _logger;
 
         public SyncHandler(
-            SyncOptions syncOptions,
-            //List<ISyncService> syncServices, 
-            //List<Type> syncServiceTypes, 
-            List<SyncPolicyDescriptor> syncPolicyDescriptors,
+            OpaClientEmbedded opaClientEmbedded,
+            ILogger<SyncHandler> logger,
             IServiceProvider serviceProvider)
         {
-            _syncOptions = syncOptions;
-            _opaClientEmbedded = serviceProvider.GetService(typeof(OpaClientEmbedded)) as OpaClientEmbedded;
+            _opaClientEmbedded = opaClientEmbedded;
             _syncServices = new Dictionary<Guid, SyncContainer>();
-            _syncPolicyDescriptors = syncPolicyDescriptors;
+            _syncPolicyDescriptors = new List<SyncPolicyDescriptor>();
             _serviceProvider = serviceProvider;
+            _logger = logger;
         }
+
+        /// <summary>
+        /// Adds a new policy to be monitored, if it does not exist, it will add it and load all the data for the policy.
+        /// This can be very inefective and time consuming if the policy does not exist beforehand.
+        /// </summary>
+        /// <param name="syncPolicyDescriptor"></param>
+        /// <returns>If the policy was found or not</returns>
+        public async Task<bool> LoadPolicy(SyncPolicyDescriptor syncPolicyDescriptor)
+        {
+            var policy = _syncPolicyDescriptors.FirstOrDefault(x => x.PolicyName == syncPolicyDescriptor.PolicyName && x.Unknown == syncPolicyDescriptor.Unknown);
+            
+            if (policy == null)
+            {
+                _syncPolicyDescriptors.Add(syncPolicyDescriptor);
+                await FullLoad();
+            }
+            return syncPolicyDescriptor.Found;
+            }
         
         /// <summary>
         /// Update the existing sync services, used by the discovery handler to update which sync services are active.
@@ -106,15 +122,38 @@ namespace OPADotNet.Embedded.sync
             }
         }
 
-        public async Task Start()
+        private async Task FullLoad()
         {
-            var logger = _serviceProvider.GetService(typeof(ILogger<SyncHandler>)) as ILogger;
-            logger.LogTrace("Starting SyncHandler");
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            var policyStep = _syncContext.NewIteration();
 
-            logger.LogTrace("Configuring SyncContext");
+            _logger.LogTrace("Start loading policy data");
+            foreach (var syncService in _syncServices)
+            {
+                await syncService.Value.SyncService.LoadPolices(policyStep, cancellationTokenSource.Token);
+            }
+
+            var dataStep = policyStep.Next();
+
+            _logger.LogTrace("Start loading data");
+            foreach (var syncService in _syncServices)
+            {
+                await syncService.Value.SyncService.LoadData(dataStep, cancellationTokenSource.Token);
+            }
+
+            await dataStep.Done();
+        }
+
+        public async Task Start(List<SyncPolicyDescriptor> syncPolicyDescriptors, IReadOnlyList<SyncServiceHolder> syncServices)
+        {
+            _logger.LogTrace("Starting SyncHandler");
+
+            _syncPolicyDescriptors.AddRange(syncPolicyDescriptors);
+
+            _logger.LogTrace("Configuring SyncContext");
             _syncContext = new SyncContext(_syncPolicyDescriptors, _opaClientEmbedded);
 
-            foreach(var syncServiceHolder in _syncOptions.SyncServices)
+            foreach(var syncServiceHolder in syncServices)
             {
                 var syncService = syncServiceHolder.GetService(_serviceProvider);
                 await syncService.Initialize(_serviceProvider);
@@ -125,35 +164,17 @@ namespace OPADotNet.Embedded.sync
                 });
             }
 
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-
-            var policyStep = _syncContext.NewIteration();
-
-            logger.LogTrace("Start loading policy data");
-            foreach (var syncService in _syncServices)
-            {
-                await syncService.Value.SyncService.LoadPolices(policyStep, cancellationTokenSource.Token);
-            }
-
-            var dataStep = policyStep.Next();
-
-            logger.LogTrace("Start loading data");
-            foreach (var syncService in _syncServices)
-            {
-                await syncService.Value.SyncService.LoadData(dataStep, cancellationTokenSource.Token);
-            }
-
-            await dataStep.Done();
+            await FullLoad();
 
             foreach (var policy in _syncPolicyDescriptors)
             {
                 if (!policy.Found)
                 {
-                    logger.LogError($"Could not find any policy with the name: '{policy.PolicyName}'");
+                    _logger.LogError($"Could not find any policy with the name: '{policy.PolicyName}'");
                 }
             }
 
-            logger.LogTrace("Starting background workers");
+            _logger.LogTrace("Starting background workers");
             foreach(var syncService in _syncServices.Values)
             {
                 var backgroundTask = Task.Factory.StartNew(async () =>

@@ -32,6 +32,11 @@ namespace OPADotNet.AspNetCore
 
         public void PreparePartial(OpaPolicyRequirement opaPolicyRequirement)
         {
+            if (opaPolicyRequirement.Index == 0)
+            {
+                RequirementsStore.AddRequirement(opaPolicyRequirement);
+            }
+
             _preparedPartials.Add(opaPolicyRequirement.Index, _opaClient.PreparePartial(opaPolicyRequirement.GetQuery()));
         }
 
@@ -41,7 +46,16 @@ namespace OPADotNet.AspNetCore
             {
                 return preparedPartial;
             }
-            throw new InvalidOperationException("The opa policy requirements did not have any prepared partial");
+            else
+            {
+                if (opaPolicyRequirement.Index == 0)
+                {
+                    RequirementsStore.AddRequirement(opaPolicyRequirement);
+                }
+                preparedPartial = _opaClient.PreparePartial(opaPolicyRequirement.GetQuery());
+                _preparedPartials.Add(opaPolicyRequirement.Index, preparedPartial);
+                return preparedPartial;
+            }
         }
     }
 }

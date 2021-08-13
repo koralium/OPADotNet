@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using OPADotNet.AspNetCore;
 using OPADotNet.AspNetCore.Builder;
+using OPADotNet.Embedded.Discovery;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,7 +46,12 @@ namespace OPADotNet.Automapper.Tests
 
             var serviceProvider = services.BuildServiceProvider();
 
-            var opaWorker = new OpaWorker(serviceProvider.GetRequiredService<PreparedPartialStore>(), serviceProvider.GetRequiredService<OpaOptions>(), serviceProvider, serviceProvider.GetRequiredService<ILogger<OpaWorker>>());
+            var opaWorker = new OpaWorker(
+                serviceProvider.GetRequiredService<PreparedPartialStore>(),
+                serviceProvider.GetRequiredService<OpaOptions>(), 
+                serviceProvider,
+                serviceProvider.GetRequiredService<DiscoveryHandler>(),
+                serviceProvider.GetRequiredService<ILogger<OpaWorker>>());
             opaWorker.StartAsync(default).Wait();
 
             return serviceProvider.GetRequiredService<IMapper>();

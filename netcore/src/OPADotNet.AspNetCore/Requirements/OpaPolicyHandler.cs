@@ -13,7 +13,9 @@
  */
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
+using OPADotNet.AspNetCore.Extensions;
 using OPADotNet.Ast.Models;
+using OPADotNet.Embedded.sync;
 using OPADotNet.Expressions;
 using System;
 using System.Collections.Generic;
@@ -28,12 +30,21 @@ namespace OPADotNet.AspNetCore.Requirements
         private readonly PreparedPartialStore _preparedPartialStore;
         private readonly ILogger<OpaPolicyHandler> _logger;
         private readonly ExpressionConverter _expressionConverter;
+        private readonly SyncHandler _syncHandler;
 
         public OpaPolicyHandler(PreparedPartialStore preparedPartialStore, ExpressionConverter expressionConverter, ILogger<OpaPolicyHandler> logger)
         {
             _preparedPartialStore = preparedPartialStore;
             _logger = logger;
             _expressionConverter = expressionConverter;
+        }
+
+        public OpaPolicyHandler(PreparedPartialStore preparedPartialStore, ExpressionConverter expressionConverter, ILogger<OpaPolicyHandler> logger, SyncHandler syncHandler)
+        {
+            _preparedPartialStore = preparedPartialStore;
+            _logger = logger;
+            _expressionConverter = expressionConverter;
+            _syncHandler = syncHandler;
         }
 
         private OpaInput GetInput(AuthorizationHandlerContext context, OpaPolicyRequirement requirement)
@@ -137,6 +148,12 @@ namespace OPADotNet.AspNetCore.Requirements
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, OpaPolicyRequirement requirement)
         {
+            if (_syncHandler != null)
+            {
+                //Check that the policy has been loaded
+                await _syncHandler.LoadPolicy(requirement.ToSyncPolicy());
+            }
+
             if (!(context.Resource is Microsoft.AspNetCore.Routing.RouteEndpoint) && !(context.Resource is AuthorizeQueryableHolder) && !(context.Resource is AuthorizeResourceDataHolder))
             {
                 //Resource authorization check

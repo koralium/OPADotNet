@@ -79,6 +79,8 @@ namespace OPADotNet.Embedded.Tests
             ServiceCollection services = new ServiceCollection();
             services.AddLogging();
 
+            services.AddSingleton<SyncHandler>();
+
             var opaClientEmbedded = new OpaClientEmbedded();
             services.AddSingleton(opaClientEmbedded);
 
@@ -89,17 +91,18 @@ namespace OPADotNet.Embedded.Tests
 
             services.AddSingleton(new DiscoveryOptions(syncServiceHolder, "data"));
             services.AddSingleton(new SyncOptions(new List<SyncServiceHolder>()));
+            services.AddSingleton<DiscoveryHandler>();
 
-            DiscoveryHandler discoveryHandler = new DiscoveryHandler(new List<SyncPolicyDescriptor>()
+            DiscoveryHandler discoveryHandler = services.BuildServiceProvider().GetRequiredService<DiscoveryHandler>();
+
+            await discoveryHandler.Start(new List<SyncPolicyDescriptor>()
             {
                 new SyncPolicyDescriptor()
                 {
                     PolicyName = "example",
                     Unknown = "reports"
                 }
-            }, services.BuildServiceProvider());
-
-            await discoveryHandler.Start();
+            });
 
             var readTxn = opaClientEmbedded.OpaStore.NewTransaction(false);
             var rolesData = readTxn.Read("/roles/inner");

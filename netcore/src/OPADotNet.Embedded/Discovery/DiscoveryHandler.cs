@@ -38,22 +38,25 @@ namespace OPADotNet.Embedded.Discovery
         private readonly ILogger<RestTarGzSync> _syncLogger;
         private readonly Dictionary<RestTarGzOptions, DiscoveryBundleContainer> _bundles = new Dictionary<RestTarGzOptions, DiscoveryBundleContainer>();
         private PreparedEvalEmbedded _discoveryEval;
-        private SyncHandler _syncHandler;
+        private readonly SyncHandler _syncHandler;
         private ISyncService _discoverySyncService;
         private DiscoverySyncContext _discoverySyncContext;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private Task _discoveryServiceTask;
 
         public DiscoveryHandler(
-            List<SyncPolicyDescriptor> syncPolicyDescriptors,
-            IServiceProvider serviceProvider
+            IServiceProvider serviceProvider,
+            ILogger<DiscoveryHandler> logger,
+            ILogger<RestTarGzSync> syncLogger,
+            SyncHandler syncHandler
             )
         {
-            _syncPolicyDescriptors = syncPolicyDescriptors;
+            _syncPolicyDescriptors = new List<SyncPolicyDescriptor>();
             _serviceProvider = serviceProvider;
-            _discoveryOptions = _serviceProvider.GetService(typeof(DiscoveryOptions)) as DiscoveryOptions;
-            _logger = _serviceProvider.GetService(typeof(ILogger<DiscoveryHandler>)) as ILogger;
-            _syncLogger = _serviceProvider.GetService(typeof(ILogger<RestTarGzSync>)) as ILogger<RestTarGzSync>;
+            _discoveryOptions = serviceProvider.GetService(typeof(DiscoveryOptions)) as DiscoveryOptions;
+            _logger = logger;
+            _syncLogger = syncLogger;
+            _syncHandler = syncHandler;
         }
 
         private HashSet<RestTarGzOptions> ParseConfiguration(DiscoveryModel discoveryModel)
@@ -149,9 +152,10 @@ namespace OPADotNet.Embedded.Discovery
             await _syncHandler.UpdateSyncServices(modifiedServices);
         }
 
-        public async Task Start()
+        public async Task Start(IEnumerable<SyncPolicyDescriptor> syncPolicyDescriptors)
         {
             _logger.LogTrace("Starting discovery handler");
+            _syncPolicyDescriptors.AddRange(syncPolicyDescriptors);
 
             if (_discoveryOptions?.DiscoveryService != null)
             {
@@ -216,10 +220,7 @@ namespace OPADotNet.Embedded.Discovery
                 modifiedServices.Add(bundleService.SyncServiceHolder);
             }
 
-            var newOptions = new SyncOptions(modifiedServices);
-            _syncHandler = new SyncHandler(newOptions, _syncPolicyDescriptors, _serviceProvider);
-            await _syncHandler.Start();
-
+            await _syncHandler.Start(_syncPolicyDescriptors, modifiedServices);
 
             if (_discoverySyncService != null)
             {

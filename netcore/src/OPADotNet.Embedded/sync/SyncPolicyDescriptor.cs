@@ -27,5 +27,20 @@ namespace OPADotNet.Embedded.sync
         public string Unknown { get; set; }
 
         internal bool Found { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is SyncPolicyDescriptor other)
+            {
+                return Equals(PolicyName, other.PolicyName) &&
+                    Equals(Unknown, other.Unknown);
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(PolicyName, Unknown);
+        }
     }
 }
