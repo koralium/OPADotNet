@@ -18,6 +18,7 @@ using OPADotNet.AspNetCore;
 using OPADotNet.AspNetCore.Builder;
 using OPADotNet.AspNetCore.Requirements;
 using OPADotNet.Embedded;
+using OPADotNet.Embedded.Discovery;
 using OPADotNet.Embedded.sync;
 using OPADotNet.Expressions;
 using OPADotNet.RestAPI;
@@ -72,6 +73,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.AddSingleton(embeddedClient.OpaStore);
                 services.AddSingleton(embeddedClient);
                 services.AddSingleton<IOpaClient>(x => x.GetRequiredService<OpaClientEmbedded>());
+                services.AddSingleton<SyncHandler>();
+                services.AddSingleton<DiscoveryHandler>();
             }
 
             services.AddHostedService<OpaWorker>();

@@ -36,17 +36,20 @@ namespace OPADotNet.AspNetCore
         private readonly OpaOptions _opaOptions;
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger _logger;
+        private readonly DiscoveryHandler _discoveryHandler;
 
         public OpaWorker(
             PreparedPartialStore preparedPartialStore,
             OpaOptions opaOptions,
             IServiceProvider serviceProvider,
+            DiscoveryHandler discoveryHandler,
             ILogger<OpaWorker> logger)
         {
             _preparedPartialStore = preparedPartialStore;
             _opaOptions = opaOptions;
             _serviceProvider = serviceProvider;
             _logger = logger;
+            _discoveryHandler = discoveryHandler;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -89,12 +92,7 @@ namespace OPADotNet.AspNetCore
                     });
                 }
 
-                DiscoveryHandler discoveryHandler = new DiscoveryHandler(
-                    syncPolicyDescriptors,
-                    _serviceProvider
-                    );
-
-                await discoveryHandler.Start();
+                await _discoveryHandler.Start(syncPolicyDescriptors);
 
                 var doneEvent = new ActivityEvent("InititializedDiscoveryAndPolicySync");
                 initActivity.AddEvent(doneEvent);
