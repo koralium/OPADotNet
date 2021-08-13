@@ -23,7 +23,7 @@ Having an OPA server as a central store for policies and data allows a single pl
 using the embedded mode. For instance external evaluation can be used during development, while embedded mode is used in production for better performance.
 This can look as follows:
 
-.. diagrams:: diagrams/opaserversync.py
+.. image:: diagrams/opaserversync.png
 
 In the picture above, the central data store is in an *Azure Blob Storage*, where all the policies and data are stored.
 The rego policy files comes from a *GIT* repository and gets published using a build pipeline and data gets published by a service that fetches data from a remote database.
