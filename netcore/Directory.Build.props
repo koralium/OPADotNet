@@ -35,7 +35,7 @@
   <!-- NuGet properties -->
   <PropertyGroup>
     <Authors>Ulimo</Authors>
-    <PackageLicenseFile>..\..\..\LICENSE</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/koralium/OPADotNet</PackageProjectUrl>
     <PackageTags>OPA OPADotNet</PackageTags>
     <RepositoryType>git</RepositoryType>
