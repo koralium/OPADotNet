@@ -24,6 +24,13 @@ allow {
 }
 
 allow {
+  input.operation = "CAN_EDIT"
+
+  # Check that the user is the owner
+  input.subject.name = data.securedata[_].owner
+}
+
+allow {
   input.operation = "CAN_DELETE"
 
   # Current user must be the owner of the object to delete

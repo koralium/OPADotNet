@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -8,7 +8,6 @@
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="4.1.1" />
     <PackageReference Include="ExpressionPowerTools.Core" Version="0.9.7-beta" />
-    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="5.0.8" />
     <PackageReference Include="Scrutor" Version="3.3.0" />
   </ItemGroup>
 

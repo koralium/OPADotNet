@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,11 +28,13 @@ namespace MvcExample.Controllers
     {
         private readonly DataDbContext _dataDbContext;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IMapper _mapper;
 
-        public DataController(DataDbContext dataDbContext, IAuthorizationService authorizationService)
+        public DataController(DataDbContext dataDbContext, IAuthorizationService authorizationService, IMapper mapper)
         {
             _dataDbContext = dataDbContext;
             _authorizationService = authorizationService;
+            _mapper = mapper;
         }
 
         // GET: DataController
@@ -44,7 +47,10 @@ namespace MvcExample.Controllers
                 return Forbid();
             }
 
-            return View(authResult.Queryable);
+            //Project the result to get the permissions the user has on each object
+            var viewModels = _mapper.ProjectTo<ViewModel>(authResult.Queryable);
+
+            return View(viewModels);
         }
 
         // GET: DataController/Details/5

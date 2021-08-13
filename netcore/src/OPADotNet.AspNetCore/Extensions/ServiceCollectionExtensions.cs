@@ -79,7 +79,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddHostedService<OpaWorker>();
 
-            services.AddSingleton<IAuthorizationHandler, OpaPolicyHandler>();
+            services.AddSingleton<IAuthorizationHandler, OpaPolicyHandler>()
+                .AddHttpContextAccessor();
 
             return services;
         }
