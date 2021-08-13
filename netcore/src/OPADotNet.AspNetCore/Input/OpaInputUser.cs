@@ -17,7 +17,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OPADotNet.AspNetCore.Requirements
+namespace OPADotNet.AspNetCore.Input
 {
     /// <summary>
     /// The user object that will be sent to OPA

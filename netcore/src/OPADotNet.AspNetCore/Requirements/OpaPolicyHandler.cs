@@ -12,8 +12,10 @@
  * limitations under the License.
  */
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OPADotNet.AspNetCore.Extensions;
+using OPADotNet.AspNetCore.Input;
 using OPADotNet.Ast.Models;
 using OPADotNet.Embedded.sync;
 using OPADotNet.Expressions;
@@ -30,31 +32,58 @@ namespace OPADotNet.AspNetCore.Requirements
         private readonly PreparedPartialStore _preparedPartialStore;
         private readonly ILogger<OpaPolicyHandler> _logger;
         private readonly ExpressionConverter _expressionConverter;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly SyncHandler _syncHandler;
 
-        public OpaPolicyHandler(PreparedPartialStore preparedPartialStore, ExpressionConverter expressionConverter, ILogger<OpaPolicyHandler> logger)
+        public OpaPolicyHandler(
+            PreparedPartialStore preparedPartialStore,
+            ExpressionConverter expressionConverter,
+            ILogger<OpaPolicyHandler> logger,
+            IHttpContextAccessor httpContextAccessor)
         {
             _preparedPartialStore = preparedPartialStore;
             _logger = logger;
             _expressionConverter = expressionConverter;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public OpaPolicyHandler(PreparedPartialStore preparedPartialStore, ExpressionConverter expressionConverter, ILogger<OpaPolicyHandler> logger, SyncHandler syncHandler)
+        public OpaPolicyHandler(
+            PreparedPartialStore preparedPartialStore, 
+            ExpressionConverter expressionConverter, 
+            ILogger<OpaPolicyHandler> logger,
+            IHttpContextAccessor httpContextAccessor,
+            SyncHandler syncHandler)
         {
             _preparedPartialStore = preparedPartialStore;
             _logger = logger;
             _expressionConverter = expressionConverter;
             _syncHandler = syncHandler;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         private OpaInput GetInput(AuthorizationHandlerContext context, OpaPolicyRequirement requirement)
         {
-            return new OpaInput()
+            return AddContextInput(new OpaInput()
             {
                 Subject = OpaInputUser.FromPrincipal(context.User),
                 Extensions = new Dictionary<string, object>(),
                 Operation = requirement.Operation
-            };
+            });
+        }
+
+        private OpaInput AddContextInput(OpaInput opaInput)
+        {
+            if (_httpContextAccessor == null || _httpContextAccessor.HttpContext == null)
+                return opaInput;
+
+            OpaInputRequest opaInputRequest = new OpaInputRequest();
+            opaInputRequest.Path = _httpContextAccessor.HttpContext.Request.Path.Value?.Split('/').Where(x => !string.IsNullOrEmpty(x)).ToList() ?? new List<string>();
+            opaInputRequest.RouteValues = _httpContextAccessor.HttpContext.Request.RouteValues;
+            opaInputRequest.Query = _httpContextAccessor.HttpContext.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToList());
+
+            opaInput.Request = opaInputRequest;
+
+            return opaInput;
         }
 
         private async Task AuthorizeResource(AuthorizationHandlerContext context, OpaPolicyRequirement requirement)

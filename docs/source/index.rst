@@ -11,5 +11,5 @@ Welcome to OPADotNet's documentation!
    :caption: Contents:
 
    gettingstarted
-   inputconstants
+   inputvalues
    automapper

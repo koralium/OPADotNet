@@ -13,26 +13,30 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OPADotNet.AspNetCore.Requirements
+namespace OPADotNet.AspNetCore.Input
 {
     /// <summary>
-    /// Class that contains the input that will be sent to OPA
+    /// Contains a single claim for a user
     /// </summary>
-    class OpaInput
+    class OpaInputUserClaim
     {
-        /// <summary>
-        /// The subject that is doing the operation
-        /// </summary>
-        [JsonPropertyName("subject")]
-        public OpaInputUser Subject { get; set; }
+        [JsonPropertyName("type")]
+        public string Type { get; set; }
 
-        [JsonPropertyName("operation")]
-        public string Operation { get; set; }
+        [JsonPropertyName("value")]
+        public string Value { get; set; }
 
-        [JsonExtensionData]
-        public Dictionary<string, object> Extensions { get; set; }
+        public static OpaInputUserClaim FromClaim(Claim claim)
+        {
+            return new OpaInputUserClaim()
+            {
+                Type = claim.Type,
+                Value = claim.Value
+            };
+        }
     }
 }

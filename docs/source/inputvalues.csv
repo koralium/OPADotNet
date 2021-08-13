@@ -1,0 +1,11 @@
+input.subject; The current user
+input.subject.name; The current user name, translated from claimsPrincipal.Identity.Name
+input.subject.claims[]; An array of the current user claims
+input.subject.claims[_].type; The type that the claim is, for example "role".
+input.subject.claims[_].value; The value of the claim.
+input.operation; The operation name set when configuring the policy.
+input.request; Contains an object with information of the current http request
+input.request.path[]; Contains an array of the url path which is split by '/', example: "test/testing" becomes ["test", "testing"]
+input.request.routeValues[]; A key value set that contains routing values
+input.request.query[]; A key value set that contains query variables in the url.
+input.resource; On single resource authorization, this contains the resource that is being authorized.
