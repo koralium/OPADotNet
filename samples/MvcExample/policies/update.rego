@@ -5,7 +5,7 @@
 allow {
   r = data.securedata[_]
 
-  r.name = input.resource.Name
+  r.name = input.resource.name
 
   # Check that the owner has not changed
   input.resource.owner = r.owner
