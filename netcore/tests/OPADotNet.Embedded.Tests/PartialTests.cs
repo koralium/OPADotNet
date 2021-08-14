@@ -18,12 +18,8 @@ using System.Threading.Tasks;
 
 namespace OPADotNet.Embedded.Tests
 {
-    public class Tests
+    public class PartialTests
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
 
         [Test]
         public void TestPreparePartial()
@@ -66,37 +62,28 @@ namespace OPADotNet.Embedded.Tests
         }
 
         private static string moduleData = @"
-package example
+        package example
 
-allow {
-  input.subject.clearance_level >= data.reports[_].clearance_level
-  input.subject.clearance_level <= data.reports[_].test_level
-}
-
-# Allow if the user is a member
-allow {
-  data.reports[_].members[_] = data.roles.identity
-  data.reports[_].members[_] = input.subject.login
-}
-
-# Allow if the user has a business area role
-# User requires a level above 20
-allow {
-  some i, k
-  data.reports[k].test = data.reports[k].asd
-  data.reports[k].businessAreaId = input.subject.roles[i].businessAreaId
-  data.reports[k].teamId = input.subject.roles[i].businessAreaId
-  input.subject.roles[i].level >= 20
-}
-";
-
-        public class TestModel
-        {
-            public int clearance_level { get; set; }
-
-            public int test_level { get; set; }
-
-            public List<string> Members { get; set; }
+        allow {
+          input.subject.clearance_level >= data.reports[_].clearance_level
+          input.subject.clearance_level <= data.reports[_].test_level
         }
+
+        # Allow if the user is a member
+        allow {
+          data.reports[_].members[_] = data.roles.identity
+          data.reports[_].members[_] = input.subject.login
+        }
+
+        # Allow if the user has a business area role
+        # User requires a level above 20
+        allow {
+          some i, k
+          data.reports[k].test = data.reports[k].asd
+          data.reports[k].businessAreaId = input.subject.roles[i].businessAreaId
+          data.reports[k].teamId = input.subject.roles[i].businessAreaId
+          input.subject.roles[i].level >= 20
+        }
+        ";
     }
 }
