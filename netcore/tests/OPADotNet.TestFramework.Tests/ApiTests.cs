@@ -16,6 +16,8 @@ using NUnit.Framework;
 using OPADotNet.Ast.Models;
 using OPADotNet.RestAPI;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace OPADotNet.TestFramework.Tests
@@ -42,6 +44,11 @@ namespace OPADotNet.TestFramework.Tests
                 {
                     name = "test"
                 })
+                .AddData("/user", new
+                {
+                    name = "test",
+                    role = "test"
+                })
                 .RunServer(5010);
         }
 
@@ -53,6 +60,19 @@ namespace OPADotNet.TestFramework.Tests
                 await _server.StopAsync();
                 _server.Dispose();
             }
+        }
+
+        [Test]
+        public async Task TestRunQuery()
+        {
+            RestOpaClient restOpaClient = new RestOpaClient("http://127.0.0.1:5010");
+            var rolesData = await restOpaClient.PrepareEvaluation("data.roles[key] = value").Evaluate<object>();
+            var stringContent = rolesData.First().ToString();
+            Assert.AreEqual("{\"key\":\"name\",\"value\":\"test\"}", stringContent);
+
+            var userData = await restOpaClient.PrepareEvaluation("data.user[key] = value").Evaluate<object>();
+            stringContent = JsonSerializer.Serialize(userData);
+            Assert.AreEqual("[{\"key\":\"name\",\"value\":\"test\"},{\"key\":\"role\",\"value\":\"test\"}]", stringContent);
         }
 
         [Test]

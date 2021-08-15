@@ -20,5 +20,7 @@ namespace OPADotNet
     public interface IOpaClient
     {
         IPreparedPartial PreparePartial(string query);
+
+        IPreparedEvaluation PrepareEvaluation(string query);
     }
 }

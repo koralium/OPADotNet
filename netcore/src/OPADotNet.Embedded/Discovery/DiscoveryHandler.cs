@@ -37,7 +37,7 @@ namespace OPADotNet.Embedded.Discovery
         private readonly ILogger _logger;
         private readonly ILogger<RestTarGzSync> _syncLogger;
         private readonly Dictionary<RestTarGzOptions, DiscoveryBundleContainer> _bundles = new Dictionary<RestTarGzOptions, DiscoveryBundleContainer>();
-        private PreparedEvalEmbedded _discoveryEval;
+        private IPreparedEvaluation _discoveryEval;
         private readonly SyncHandler _syncHandler;
         private ISyncService _discoverySyncService;
         private DiscoverySyncContext _discoverySyncContext;
@@ -113,7 +113,7 @@ namespace OPADotNet.Embedded.Discovery
             var discoveryData = await _discoveryEval.Evaluate<DiscoveryModel>(null);
 
             //Parse the configuration
-            var bundleConfigurations = ParseConfiguration(discoveryData);
+            var bundleConfigurations = ParseConfiguration(discoveryData.First());
 
             var toDeleteList = _bundles.Keys.Except(bundleConfigurations);
 
@@ -189,7 +189,7 @@ namespace OPADotNet.Embedded.Discovery
                 var discoveryData = await _discoveryEval.Evaluate<DiscoveryModel>(null);
 
                 //Parse the configuration
-                var bundleConfigurations = ParseConfiguration(discoveryData);
+                var bundleConfigurations = ParseConfiguration(discoveryData.First());
 
                 foreach(var bundle in bundleConfigurations)
                 {

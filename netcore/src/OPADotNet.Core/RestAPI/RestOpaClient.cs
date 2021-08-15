@@ -13,6 +13,7 @@
  */
 using OPADotNet.Ast;
 using OPADotNet.Ast.Models;
+using OPADotNet.Core.RestAPI;
 using OPADotNet.Core.RestAPI.Models;
 using OPADotNet.Partial.Ast;
 using OPADotNet.RestAPI.Models;
@@ -22,6 +23,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace OPADotNet.RestAPI
@@ -88,6 +90,29 @@ namespace OPADotNet.RestAPI
 
             var content = await result.Content.ReadAsStringAsync();
             return PartialJsonConverter.ReadCompileResponse(content).Result;
+        }
+
+        internal virtual async Task<IEnumerable<TBinding>> Query<TBinding>(string query, object input)
+        {
+            if (string.IsNullOrEmpty(query))
+            {
+                throw new ArgumentException($"'{nameof(query)}' cannot be null or empty.", nameof(query));
+            }
+
+            var httpClient = new HttpClient();
+            var result = await httpClient.PostAsJsonAsync(new Uri(_httpUrl, "/v1/query"), new QueryRequest()
+            {
+                Input = input,
+                Query = query
+            });
+
+            var content = await result.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<QueryResponse<TBinding>>(content).Result;
+        }
+
+        public virtual IPreparedEvaluation PrepareEvaluation(string query)
+        {
+            return new RestPreparedEvaluation(this, query);
         }
     }
 }
