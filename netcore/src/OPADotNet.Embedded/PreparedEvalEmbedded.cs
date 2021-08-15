@@ -22,8 +22,10 @@ using System.Threading.Tasks;
 
 namespace OPADotNet.Embedded
 {
-    internal class PreparedEvalEmbedded : IDisposable, IPreparedEmbedded
+    internal class PreparedEvalEmbedded : IPreparedEvaluation, IPreparedEmbedded
     {
+        private static object emptyInput = new object();
+
         private int _preparedEvalId;
         private bool disposedValue;
         private readonly string _query;
@@ -51,11 +53,16 @@ namespace OPADotNet.Embedded
             _preparedEvalId = result;
         }
 
-        public Task<TBinding> Evaluate<TBinding>(object input)
+        public Task<IEnumerable<TBinding>> Evaluate<TBinding>(object input = null)
         {
+            if (input == null)
+            {
+                input = emptyInput;
+            }
+
             var inputJson = JsonSerializer.Serialize(input);
 
-            var t = new TaskCompletionSource<TBinding>();
+            var t = new TaskCompletionSource<IEnumerable<TBinding>>();
             int result = RegoWrapper.PreparedEval(_preparedEvalId, inputJson);
 
             if (result < 0)
@@ -68,7 +75,7 @@ namespace OPADotNet.Embedded
             var content = RegoWrapper.GetString(result);
 
             var evaluateResult = JsonSerializer.Deserialize<List<EvaluateResult<TBinding>>>(content);
-            t.SetResult(evaluateResult.First().Bindings);
+            t.SetResult(evaluateResult.Select(x => x.Bindings));
             return t.Task;
         }
 

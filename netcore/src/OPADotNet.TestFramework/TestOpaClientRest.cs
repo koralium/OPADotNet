@@ -42,6 +42,11 @@ namespace OPADotNet.TestFramework
             return _opaClientEmbedded.PreparePartial(query);
         }
 
+        public override IPreparedEvaluation PrepareEvaluation(string query)
+        {
+            return _opaClientEmbedded.PrepareEvaluation(query);
+        }
+
         public override Task<T> GetData<T>(string path)
         {
             var txn = _opaClientEmbedded.OpaStore.NewTransaction(false);

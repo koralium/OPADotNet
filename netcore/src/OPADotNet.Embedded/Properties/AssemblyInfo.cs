@@ -17,3 +17,4 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("OPADotNet.Embedded.Tests")]
 [assembly: InternalsVisibleTo("OPADotNet.Benchmarks")]
 [assembly: InternalsVisibleTo("OPADotNet.Automapper.Tests")]
+[assembly: InternalsVisibleTo("OPADotNet.TestFramework")]
