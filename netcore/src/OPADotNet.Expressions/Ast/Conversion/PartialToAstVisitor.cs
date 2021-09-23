@@ -90,7 +90,8 @@ namespace OPADotNet.Expressions.Ast
                 {
                     Type = BooleanComparisonType.NotEqualTo,
                     Left = leftScalar,
-                    Right = NullLiteral.Defult
+                    Right = NullLiteral.Defult,
+                    IsReferenceNullCheck = true
                 };
             }
             if (partialExpression.Terms.Count != 3)
