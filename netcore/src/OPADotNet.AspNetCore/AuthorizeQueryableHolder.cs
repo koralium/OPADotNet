@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+using OPADotNet.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,7 @@ namespace OPADotNet.AspNetCore
     {
         public Type EntityType { get; }
         public ParameterExpression ParameterExpression { get; }
+        public ExpressionConversionOptions Options { get; }
 
         private readonly List<Expression> expressions = new List<Expression>();
 
@@ -45,10 +47,11 @@ namespace OPADotNet.AspNetCore
             return Expression.Lambda(expr, ParameterExpression);
         }
 
-        public AuthorizeQueryableHolder(Type entityType, ParameterExpression parameterExpression)
+        public AuthorizeQueryableHolder(Type entityType, ParameterExpression parameterExpression, ExpressionConversionOptions options)
         {
             EntityType = entityType;
             ParameterExpression = parameterExpression;
+            Options = options;
         }
     }
 }

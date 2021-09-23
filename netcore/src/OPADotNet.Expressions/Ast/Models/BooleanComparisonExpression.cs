@@ -25,6 +25,8 @@ namespace OPADotNet.Expressions.Ast.Models
 
         public BooleanComparisonType Type { get; set; }
 
+        public bool IsReferenceNullCheck { get; set; }
+
         public override T Accept<T>(ExpressionAstVisitor<T> visitor)
         {
             return visitor.VisitBooleanComparisonExpression(this);

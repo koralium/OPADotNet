@@ -38,12 +38,14 @@ namespace OPADotNet.Expressions
         private readonly Expression _rootParameter;
         private readonly Dictionary<string, ParameterExpression> _parameters = new Dictionary<string, ParameterExpression>();
         private readonly ILogger _logger;
+        private readonly ExpressionConversionOptions _options;
 
-        public AstToExpressionVisitor(Expression parameterExpression, Type rootType, ILogger logger)
+        public AstToExpressionVisitor(Expression parameterExpression, Type rootType, ILogger logger, ExpressionConversionOptions options)
         {
             _rootType = rootType;
             _rootParameter = parameterExpression;
             _logger = logger;
+            _options = options;
         }
 
         public override Expression VisitStringLiteral(StringLiteral stringLiteral)
@@ -77,7 +79,14 @@ namespace OPADotNet.Expressions
 
             for (int i = 1; i < query.AndExpressions.Count; i++)
             {
-                expr = Expression.AndAlso(expr, Visit(query.AndExpressions[i]));
+                var result = Visit(query.AndExpressions[i]);
+
+                if (result is ConstantExpression constantExpression && constantExpression.Value.Equals(true))
+                {
+                    continue;
+                }
+
+                expr = Expression.AndAlso(expr, result);
             }
             return expr;
         }
@@ -105,12 +114,26 @@ namespace OPADotNet.Expressions
             {
                 return Expression.Constant(false);
             }
+
+            // If it is just a constant true, return directly since it will always be true.
+            if (expr is ConstantExpression exprConstantExpression && exprConstantExpression.Value.Equals(true))
+            {
+                return exprConstantExpression;
+            }
+
             i++;
             for (; i < queries.OrQueries.Count; i++)
             {
                 try
                 {
                     var otherExpr = Visit(queries.OrQueries[i]);
+
+                    //If there is a true, in an OR, just return true
+                    if (otherExpr is ConstantExpression otherExprConstantExpression && otherExprConstantExpression.Value.Equals(true))
+                    {
+                        return otherExprConstantExpression;
+                    }
+
                     expr = Expression.OrElse(expr, otherExpr);
                 }
                 catch(Exception e)
@@ -154,6 +177,11 @@ namespace OPADotNet.Expressions
 
         public override Expression VisitBooleanComparisonExpression(BooleanComparisonExpression booleanComparisonExpression)
         {
+            if (_options.IgnoreNotNullReferenceChecks && booleanComparisonExpression.IsReferenceNullCheck)
+            {
+                return Expression.Constant(true);
+            }
+
             var left = Visit(booleanComparisonExpression.Left);
             var right = Visit(booleanComparisonExpression.Right);
             return PredicateUtils.CreateComparisonExpression(left, right, booleanComparisonExpression.Type);

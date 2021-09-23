@@ -123,7 +123,7 @@ namespace OPADotNet.AspNetCore.Requirements
                 return;
             }
 
-            var expression = await _expressionConverter.ToExpression(result, requirement.GetUnknown(), authorizeQueryableHolder.ParameterExpression);
+            var expression = await _expressionConverter.ToExpression(result, requirement.GetUnknown(), authorizeQueryableHolder.ParameterExpression, authorizeQueryableHolder.Options);
             authorizeQueryableHolder.AddFilter(expression);
             context.Succeed(requirement);
         }

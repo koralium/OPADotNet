@@ -13,6 +13,7 @@
  */
 using Microsoft.AspNetCore.Authorization;
 using OPADotNet.AspNetCore;
+using OPADotNet.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,8 @@ namespace Microsoft.AspNetCore.Authorization
 {
     public static class IAuthorizationServiceExtensions
     {
+        private const string EntityFrameworkNamespace = "Microsoft.EntityFrameworkCore";
+
         /// <summary>
         /// Filters an IQueryable to only display the data that a user has the right to see.
         /// </summary>
@@ -34,7 +37,15 @@ namespace Microsoft.AspNetCore.Authorization
         /// <returns></returns>
         public static async Task<AuthorizeQueryableResult<T>> AuthorizeQueryable<T>(this IAuthorizationService authorizationService,ClaimsPrincipal user, IQueryable<T> data, string policyName)
         {
-            var (authResult, filter) = await GetOpaFilterExpression<T>(authorizationService, user, policyName);
+            ExpressionConversionOptions options = new ExpressionConversionOptions();
+
+            // If it is entity framework, we skip null checks on references
+            if (data.GetType().Namespace.StartsWith(EntityFrameworkNamespace))
+            {
+                options.IgnoreNotNullReferenceChecks = true;
+            }
+
+            var (authResult, filter) = await GetOpaFilterExpression<T>(authorizationService, user, policyName, options);
 
             if (authResult.Succeeded)
             {
@@ -58,9 +69,9 @@ namespace Microsoft.AspNetCore.Authorization
         /// <param name="user"></param>
         /// <param name="policyName"></param>
         /// <returns></returns>
-        public static async Task<(AuthorizationResult AuthenticationResult, Expression<Func<T, bool>> Expression)> GetOpaFilterExpression<T>(this IAuthorizationService authorizationService, ClaimsPrincipal user, string policyName)
+        public static async Task<(AuthorizationResult AuthenticationResult, Expression<Func<T, bool>> Expression)> GetOpaFilterExpression<T>(this IAuthorizationService authorizationService, ClaimsPrincipal user, string policyName, ExpressionConversionOptions options = null)
         {
-            var holder = new AuthorizeQueryableHolder(typeof(T), Expression.Parameter(typeof(T)));
+            var holder = new AuthorizeQueryableHolder(typeof(T), Expression.Parameter(typeof(T)), options);
 
             var authorizeResult = await authorizationService.AuthorizeAsync(user, holder, policyName);
             return (authorizeResult, holder.GetLambdaExpression() as Expression<Func<T, bool>>);
@@ -71,10 +82,9 @@ namespace Microsoft.AspNetCore.Authorization
             return authorizationService.GetOpaFilterExpression(user, policyName, Expression.Parameter(objectType));
         }
 
-        public static async Task<(AuthorizationResult AuthenticationResult, LambdaExpression)> GetOpaFilterExpression(this IAuthorizationService authorizationService, ClaimsPrincipal user, string policyName, ParameterExpression parameterExpression)
+        public static async Task<(AuthorizationResult AuthenticationResult, LambdaExpression)> GetOpaFilterExpression(this IAuthorizationService authorizationService, ClaimsPrincipal user, string policyName, ParameterExpression parameterExpression, ExpressionConversionOptions options = null)
         {
-            var holder = new AuthorizeQueryableHolder(parameterExpression.Type, parameterExpression);
-
+            var holder = new AuthorizeQueryableHolder(parameterExpression.Type, parameterExpression, options);
             var authorizeResult = await authorizationService.AuthorizeAsync(user, holder, policyName);
             return (authorizeResult, holder.GetLambdaExpression());
         }

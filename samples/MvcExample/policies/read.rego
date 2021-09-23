@@ -3,5 +3,10 @@
 # This policy regards which resources a user can read
 
 allow {
-  data.securedata[_].owner = input.subject.name
+  allowed[_]
+}
+
+allowed[secure] {
+  secure := data.securedata[_]
+  secure.owner == input.subject.name
 }
