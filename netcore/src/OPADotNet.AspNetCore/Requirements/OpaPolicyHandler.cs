@@ -48,8 +48,8 @@ namespace OPADotNet.AspNetCore.Requirements
         }
 
         public OpaPolicyHandler(
-            PreparedPartialStore preparedPartialStore, 
-            ExpressionConverter expressionConverter, 
+            PreparedPartialStore preparedPartialStore,
+            ExpressionConverter expressionConverter,
             ILogger<OpaPolicyHandler> logger,
             IHttpContextAccessor httpContextAccessor,
             SyncHandler syncHandler)
@@ -172,7 +172,9 @@ namespace OPADotNet.AspNetCore.Requirements
                 await _syncHandler.LoadPolicy(requirement.ToSyncPolicy());
             }
 
-            if (!(context.Resource is Microsoft.AspNetCore.Routing.RouteEndpoint) && !(context.Resource is AuthorizeQueryableHolder) && !(context.Resource is AuthorizeResourceDataHolder))
+            if (context.Resource != null && !(context.Resource is Microsoft.AspNetCore.Routing.RouteEndpoint)
+               && !(context.Resource is AuthorizeQueryableHolder)
+               && !(context.Resource is AuthorizeResourceDataHolder))
             {
                 //Resource authorization check
                 await AuthorizeResource(context, requirement);
