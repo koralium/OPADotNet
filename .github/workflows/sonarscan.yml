@@ -12,13 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet: ['3.1.x', 6.0.x']
+        dotnet: ['3.1.x', '6.0.x']
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ matrix.dotnet }}
+        include-prerelease: true
     - uses: actions/setup-java@v1
       with:
         java-version: '11' # The JDK version to make available on the path.
