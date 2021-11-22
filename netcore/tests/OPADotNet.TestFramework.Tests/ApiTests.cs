@@ -117,8 +117,6 @@ namespace OPADotNet.TestFramework.Tests
                }
            };
             Assert.That(userData, Is.EquivalentTo(expeced));
-            //Assert.AreEqual(expeced, userData);
-            //Assert.AreEqual("[{\"key\":\"name\",\"value\":\"test\"},{\"key\":\"role\",\"value\":\"test\"}]", stringContent);
         }
 
         [Test]
