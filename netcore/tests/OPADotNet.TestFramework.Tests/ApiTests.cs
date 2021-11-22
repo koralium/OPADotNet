@@ -102,7 +102,6 @@ namespace OPADotNet.TestFramework.Tests
             Assert.AreEqual("{\"key\":\"name\",\"value\":\"test\"}", stringContent);
 
             var userData = await restOpaClient.PrepareEvaluation("data.user[key] = value").Evaluate<RunQueryResponse>();
-            //stringContent = JsonSerializer.Serialize(userData);
             List<RunQueryResponse> expeced = new List<RunQueryResponse>()
            {
                new RunQueryResponse()
