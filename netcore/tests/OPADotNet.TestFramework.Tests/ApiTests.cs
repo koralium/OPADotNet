@@ -15,9 +15,11 @@ using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using OPADotNet.Ast.Models;
 using OPADotNet.RestAPI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace OPADotNet.TestFramework.Tests
@@ -62,6 +64,35 @@ namespace OPADotNet.TestFramework.Tests
             }
         }
 
+        private class RunQueryResponse
+        {
+            [JsonPropertyName("key")]
+            public string Key { get; set; }
+
+            [JsonPropertyName("value")]
+            public string Value { get; set; }
+
+            public override bool Equals(object obj)
+            {
+                if (obj is RunQueryResponse other)
+                {
+                    return Key.Equals(other.Key) &&
+                        Value.Equals(other.Value);
+                }
+                return false;
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Key, Value);
+            }
+
+            public override string ToString()
+            {
+                return $"Key = {Key}, Value = {Value}";
+            }
+        }
+
         [Test]
         public async Task TestRunQuery()
         {
@@ -70,9 +101,21 @@ namespace OPADotNet.TestFramework.Tests
             var stringContent = rolesData.First().ToString();
             Assert.AreEqual("{\"key\":\"name\",\"value\":\"test\"}", stringContent);
 
-            var userData = await restOpaClient.PrepareEvaluation("data.user[key] = value").Evaluate<object>();
-            stringContent = JsonSerializer.Serialize(userData);
-            Assert.AreEqual("[{\"key\":\"name\",\"value\":\"test\"},{\"key\":\"role\",\"value\":\"test\"}]", stringContent);
+            var userData = await restOpaClient.PrepareEvaluation("data.user[key] = value").Evaluate<RunQueryResponse>();
+            List<RunQueryResponse> expeced = new List<RunQueryResponse>()
+           {
+               new RunQueryResponse()
+               {
+                   Key = "name",
+                   Value = "test"
+               },
+               new RunQueryResponse()
+               {
+                   Key = "role",
+                   Value = "test"
+               }
+           };
+            Assert.That(userData, Is.EquivalentTo(expeced));
         }
 
         [Test]
