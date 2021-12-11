@@ -74,6 +74,11 @@ namespace OPADotNet.Embedded
 
             var content = RegoWrapper.GetString(result);
 
+            if (content == null || content == "null")
+            {
+                return null;
+            }
+
             var evaluateResult = JsonSerializer.Deserialize<List<EvaluateResult<TBinding>>>(content);
             t.SetResult(evaluateResult.Select(x => x.Bindings));
             return t.Task;
