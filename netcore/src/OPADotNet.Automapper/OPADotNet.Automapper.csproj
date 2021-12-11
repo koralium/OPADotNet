@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
@@ -11,8 +11,8 @@
     <PackageReference Include="Scrutor" Version="3.3.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\OPADotNet.AspNetCore\OPADotNet.AspNetCore.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\OPADotNet.AspNetCore\OPADotNet.AspNetCore.csproj" />
+	</ItemGroup>
 
 </Project>
