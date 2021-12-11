@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 
 namespace MvcExample.Controllers
 {
+    [Authorize(Policy = "read")]
     public class DataController : Controller
     {
         private readonly DataDbContext _dataDbContext;
