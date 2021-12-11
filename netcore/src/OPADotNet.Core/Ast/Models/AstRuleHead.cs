@@ -25,6 +25,9 @@ namespace OPADotNet.Ast.Models
         [JsonPropertyName("value")]
         public AstTerm Value { get; set; }
 
+        [JsonPropertyName("key")]
+        public AstTerm Key { get; set; }
+
         public override T Accept<T>(AstVisitor<T> visitor)
         {
             return visitor.VisitRuleHead(this);
@@ -35,14 +38,15 @@ namespace OPADotNet.Ast.Models
             if (obj is AstRuleHead other)
             {
                 return Equals(Name, other.Name) &&
-                    Equals(Value, other.Value);
+                    Equals(Value, other.Value) &&
+                    Equals(Key, other.Key);
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Name, Value);
+            return HashCode.Combine(Name, Value, Key);
         }
     }
 }
