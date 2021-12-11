@@ -76,7 +76,7 @@ namespace OPADotNet.Embedded
 
             if (content == null || content == "null")
             {
-                return null;
+                return Task.FromResult<IEnumerable<TBinding>>(null);
             }
 
             var evaluateResult = JsonSerializer.Deserialize<List<EvaluateResult<TBinding>>>(content);
