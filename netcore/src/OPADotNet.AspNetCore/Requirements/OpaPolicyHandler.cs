@@ -174,7 +174,8 @@ namespace OPADotNet.AspNetCore.Requirements
 
             if (context.Resource != null && !(context.Resource is Microsoft.AspNetCore.Routing.RouteEndpoint)
                && !(context.Resource is AuthorizeQueryableHolder)
-               && !(context.Resource is AuthorizeResourceDataHolder))
+               && !(context.Resource is AuthorizeResourceDataHolder)
+               && !(context.Resource is HttpContext))
             {
                 //Resource authorization check
                 await AuthorizeResource(context, requirement);
