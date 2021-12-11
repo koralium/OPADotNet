@@ -4,11 +4,10 @@ import (
 	"context"
 
 	"github.com/open-policy-agent/opa/storage"
-	"github.com/open-policy-agent/opa/storage/inmem"
 )
 
 func newStore() storage.Store {
-	return inmem.New()
+	return NewRemote()
 }
 
 func newTransaction(store storage.Store, write bool) (storage.Transaction, error) {

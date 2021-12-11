@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+using OPADotNet.Ast;
+using OPADotNet.Ast.Models;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -100,5 +102,26 @@ namespace OPADotNet.Embedded.Internal
             FreeString(index);
             return content;
         }
+
+        private delegate string FunctionCallbackDelegate(string json);
+
+        [DllImport("regosdk", EntryPoint = "RegisterFunction1", CharSet = CharSet.Ansi)]
+        private static extern void RegisterFunction1Internal(string name, FunctionCallbackDelegate callback);
+
+        public delegate AstTerm Function1Resolver(AstTerm astTerm);
+
+        public static void RegisterFunction1(string name, Function1Resolver resolver)
+        {
+            RegisterFunction1Internal(name, (json) =>
+            {
+                var term = PartialJsonConverter.ReadTerm(json);
+                return PartialJsonConverter.SerializeTerm(resolver(term));
+            });
+        }
+
+        public delegate string StoreResolver(string path);
+
+        [DllImport("regosdk", EntryPoint = "RegisterRemoteStore", CharSet = CharSet.Ansi)]
+        public static extern void RegisterRemoteStore(int storeId, string path, StoreResolver storeResolver);
     }
 }

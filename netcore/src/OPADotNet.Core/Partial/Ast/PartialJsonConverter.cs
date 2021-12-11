@@ -63,6 +63,16 @@ namespace OPADotNet.Ast
             return JsonSerializer.Deserialize<GetPoliciesResponse>(json, _serializerOptions);
         }
 
+        public static AstTerm ReadTerm(string json)
+        {
+            return JsonSerializer.Deserialize<AstTerm>(json, _serializerOptions);
+        }
+
+        public static string SerializeTerm(AstTerm term)
+        {
+            return JsonSerializer.Serialize(term, _serializerOptions);
+        }
+
         internal static CompileResponse ReadCompileResponse(string json)
         {
             return JsonSerializer.Deserialize<CompileResponse>(json, _serializerOptions);

@@ -20,5 +20,45 @@ namespace OPADotNet.Ast.Models
     public abstract class AstTerm : AstNode
     {
         public abstract AstTermType Type { get; }
+
+        public static AstTermString String(string value)
+        {
+            return new AstTermString()
+            {
+                Value = value
+            };
+        }
+
+        public static AstTermNumber Number(decimal number)
+        {
+            return new AstTermNumber()
+            {
+                Value = number
+            };
+        }
+
+        public static AstTermArray Array(List<AstTerm> array)
+        {
+            return new AstTermArray()
+            {
+                Value = array
+            };
+        }
+
+        public static AstTermBoolean Bool(bool value)
+        {
+            return new AstTermBoolean()
+            {
+                Value = value
+            };
+        }
+
+        public static AstTermObject Object(List<AstObjectProperty> properties)
+        {
+            return new AstTermObject()
+            {
+                Value = properties
+            };
+        }
     }
 }
