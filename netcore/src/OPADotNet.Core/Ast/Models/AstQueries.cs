@@ -24,6 +24,9 @@ namespace OPADotNet.Ast.Models
         [JsonPropertyName("queries")]
         public List<AstBody> Queries { get; set; }
 
+        [JsonPropertyName("modules")]
+        public List<AstPolicy> Modules { get; set; }
+
         public override T Accept<T>(AstVisitor<T> visitor)
         {
             return visitor.VisitQueries(this);
@@ -33,7 +36,8 @@ namespace OPADotNet.Ast.Models
         {
             if (obj is AstQueries other)
             {
-                return Queries.AreEqual(other.Queries);
+                return Queries.AreEqual(other.Queries) &&
+                    Modules.AreEqual(other.Modules);
             }
             return false;
         }
@@ -45,6 +49,14 @@ namespace OPADotNet.Ast.Models
             {
                 hashCode.Add(query);
             }
+            if (Modules != null)
+            {
+                foreach (var module in Modules)
+                {
+                    hashCode.Add(module);
+                }
+            }
+            
             return hashCode.ToHashCode();
         }
     }

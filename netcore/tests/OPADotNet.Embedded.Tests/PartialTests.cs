@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 using NUnit.Framework;
+using OPADotNet.Ast.Models;
 using OPADotNet.Expressions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,6 +21,183 @@ namespace OPADotNet.Embedded.Tests
 {
     public class PartialTests
     {
+        [Test]
+        public async Task TestPartialWithModule()
+        {
+            OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded();
+            OpaStore opaStore = opaClientEmbedded.OpaStore;
+            var txn = opaStore.NewTransaction(true);
+            txn.UpsertPolicy("policy", @"
+            package example
+
+            allow[msg] {
+                data.reports[_].level = input.subject.clearance_level
+                msg := ""message""
+            }
+            
+            ");
+            txn.Commit();
+
+            var preparedPartial = opaClientEmbedded.PreparePartial("d = data.example.allow");
+
+            var result = await preparedPartial.Partial(new
+            {
+                subject = new
+                {
+                    clearance_level = 20
+                }
+            }, new List<string>()
+                {
+                    "data.reports"
+                });
+
+            var expected = new AstQueries()
+            {
+                Modules = new List<AstPolicy>()
+                {
+                    new AstPolicy()
+                    {
+                        Package = new AstPolicyPackage()
+                        {
+                            Path = new List<AstTerm>()
+                            {
+                                new AstTermVar()
+                                {
+                                    Value = "data"
+                                },
+                                new AstTermString()
+                                {
+                                    Value = "partial"
+                                },
+                                new AstTermString()
+                                {
+                                    Value = "example"
+                                }
+                            }
+                        },
+                        Rules = new List<AstPolicyRule>()
+                        {
+                            new AstPolicyRule()
+                            {
+                                Head = new AstRuleHead()
+                                {
+                                    Name = "allow",
+                                    Key = new AstTermString()
+                                    {
+                                        Value = "message"
+                                    }
+                                },
+                                Body = new AstBody()
+                                {
+                                    Expressions = new List<AstExpression>()
+                                    {
+                                        new AstExpression()
+                                        {
+                                            Index = 0,
+                                            Terms = new List<AstTerm>()
+                                            {
+                                                new AstTermRef()
+                                                {
+                                                    Value = new List<AstTerm>()
+                                                    {
+                                                        new AstTermVar()
+                                                        {
+                                                            Value = "eq"
+                                                        }
+                                                    }
+                                                },
+                                                new AstTermNumber()
+                                                {
+                                                    Value = 20
+                                                },
+                                                new AstTermRef()
+                                                {
+                                                    Value = new List<AstTerm>()
+                                                    {
+                                                        new AstTermVar()
+                                                        {
+                                                            Value = "data"
+                                                        },
+                                                        new AstTermString()
+                                                        {
+                                                            Value = "reports"
+                                                        },
+                                                        new AstTermVar()
+                                                        {
+                                                            Value = "$01"
+                                                        },
+                                                        new AstTermString()
+                                                        {
+                                                            Value = "level"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                Queries = new List<AstBody>()
+                {
+                    new AstBody()
+                    {
+                        Expressions = new List<AstExpression>()
+                        {
+                            new AstExpression()
+                            {
+                                Index = 0,
+                                Terms = new List<AstTerm>()
+                                {
+                                    new AstTermRef()
+                                    {
+                                        Value = new List<AstTerm>()
+                                        {
+                                            new AstTermVar()
+                                            {
+                                                Value = "eq"
+                                            }
+                                        }
+                                    },
+                                    new AstTermRef()
+                                    {
+                                        Value = new List<AstTerm>()
+                                        {
+                                            new AstTermVar()
+                                            {
+                                                Value = "data"
+                                            },
+                                            new AstTermString()
+                                            {
+                                                Value = "partial"
+                                            },
+                                            new AstTermString()
+                                            {
+                                                Value = "example"
+                                            },
+                                            new AstTermString()
+                                            {
+                                                Value = "allow"
+                                            }
+                                        }
+                                    },
+                                    new AstTermVar()
+                                    {
+                                        Value = "d"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            Assert.AreEqual(expected, result);
+            
+        }
+
 
         [Test]
         public void TestPreparePartial()

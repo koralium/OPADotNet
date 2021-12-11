@@ -46,6 +46,7 @@ namespace OPADotNet.Ast
         public virtual T VisitQueries(AstQueries partialQueries)
         {
             Visit(partialQueries.Queries);
+            Visit(partialQueries.Modules);
             return default;
         }
 
@@ -111,12 +112,14 @@ namespace OPADotNet.Ast
         {
             Visit(policyRule.Body);
             Visit(policyRule.Head);
+            Visit(policyRule.Else);
             return default;
         }
 
         public virtual T VisitRuleHead(AstRuleHead ruleHead)
         {
             Visit(ruleHead.Value);
+            Visit(ruleHead.Key);
             return default;
         }
 
