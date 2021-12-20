@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 using OPADotNet.Ast.Models;
+using OPADotNet.Core.Partial.Ast.Converters;
 using OPADotNet.Extensions;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,7 @@ namespace OPADotNet.Partial.Ast.Converters
         private static PartialTermBooleanConverter booleanConverter = new PartialTermBooleanConverter();
         private static PartialTermObjectConverter objectConverter = new PartialTermObjectConverter();
         private static AstTermArrayConverter arrayConverter = new AstTermArrayConverter();
+        private static PartialTermSetConverter setConverter = new PartialTermSetConverter();
 
         public override AstTerm Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
@@ -64,6 +66,9 @@ namespace OPADotNet.Partial.Ast.Converters
                     break;
                 case "array":
                     returnValue = arrayConverter.Read(ref reader, typeof(AstTermArray), options);
+                    break;
+                case "set":
+                    returnValue = setConverter.Read(ref reader, typeof(AstTermSet), options);
                     break;
                 default:
                     throw new NotSupportedException($"term type '{typeName}' is not supported.");
@@ -103,6 +108,9 @@ namespace OPADotNet.Partial.Ast.Converters
                     break;
                 case "array":
                     arrayConverter.Write(writer, value as AstTermArray, options);
+                    break;
+                case "set":
+                    setConverter.Write(writer, value as AstTermSet, options);
                     break;
                 default:
                     throw new NotSupportedException($"term type '{typeName}' is not supported.");

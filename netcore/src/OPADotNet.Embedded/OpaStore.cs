@@ -34,7 +34,7 @@ namespace OPADotNet.Embedded
             _opaClientEmbedded = opaClientEmbedded;
         }
 
-        internal OpaCompiler GetCompiler()
+        public OpaCompiler GetCompiler()
         {
             if (_opaCompiler == null)
             {
