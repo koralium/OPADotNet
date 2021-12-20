@@ -15,6 +15,7 @@ using OPADotNet.Ast;
 using OPADotNet.Ast.Models;
 using OPADotNet.Core.RestAPI;
 using OPADotNet.Core.RestAPI.Models;
+using OPADotNet.Models;
 using OPADotNet.Partial.Ast;
 using OPADotNet.RestAPI.Models;
 using System;
@@ -41,7 +42,7 @@ namespace OPADotNet.RestAPI
             _httpUrl = uri;
         }
 
-        public virtual async Task<List<Policy>> GetPolicies()
+        public virtual async Task<IReadOnlyList<Policy>> GetPolicies()
         {
             var httpClient = new HttpClient();
 

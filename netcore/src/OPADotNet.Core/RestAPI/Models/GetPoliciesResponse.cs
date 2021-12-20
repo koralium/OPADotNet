@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 using OPADotNet.Ast.Models;
+using OPADotNet.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -22,6 +23,6 @@ namespace OPADotNet.RestAPI.Models
     public class GetPoliciesResponse
     {
         [JsonPropertyName("result")]
-        public List<Policy> Result { get; set; }
+        public IReadOnlyList<Policy> Result { get; set; }
     }
 }

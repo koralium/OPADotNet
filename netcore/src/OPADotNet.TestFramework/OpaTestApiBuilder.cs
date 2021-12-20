@@ -17,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OPADotNet.Ast.Models;
 using OPADotNet.Embedded;
+using OPADotNet.Models;
 using OPADotNet.RestAPI;
 using System;
 using System.Collections.Generic;
@@ -83,12 +84,7 @@ namespace OPADotNet.TestFramework
             {
                 if (astPolicies.TryGetValue(policy.Key, out var astPolicy))
                 {
-                    output.Add(new Policy()
-                    {
-                        Ast = astPolicy,
-                        Id = policy.Key,
-                        Raw = policy.Value
-                    });
+                    output.Add(new Policy(policy.Key, policy.Value, astPolicy));
                 }
             }
             return output;

@@ -11,22 +11,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+using OPADotNet.Ast.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace OPADotNet.Ast.Models
+namespace OPADotNet.Models
 {
     public class Policy
     {
         [JsonPropertyName("id")]
-        public string Id { get; set; }
+        public string Id { get; }
 
         [JsonPropertyName("raw")]
-        public string Raw { get; set; }
+        public string Raw { get; }
 
         [JsonPropertyName("ast")]
-        public AstPolicy Ast { get; set; }
+        public AstPolicy Ast { get; }
+
+        public Policy(string id, string raw, AstPolicy ast)
+        {
+            Id = id;
+            Raw = raw;
+            Ast = ast;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Policy other)
+            {
+                return Id.Equals(other.Id) &&
+                    Raw.Equals(other.Raw) &&
+                    Ast.Equals(other.Ast);
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, Raw, Ast);
+        }
     }
 }

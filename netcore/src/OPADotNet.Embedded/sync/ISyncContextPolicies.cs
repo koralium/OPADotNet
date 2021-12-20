@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 using OPADotNet.Ast.Models;
+using OPADotNet.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;

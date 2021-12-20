@@ -14,6 +14,7 @@
 using OPADotNet.Ast;
 using OPADotNet.Ast.Models;
 using OPADotNet.Embedded.Internal;
+using OPADotNet.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -34,12 +35,7 @@ namespace OPADotNet.Embedded.utils
 
             var content = RegoWrapper.GetString(result);
             var astPolicy = PartialJsonConverter.ReadEmbeddedPolicy(content);
-            return new Policy()
-            {
-                Id = fileName,
-                Raw = rawText,
-                Ast = astPolicy
-            };
+            return new Policy(fileName, rawText, astPolicy);
         }
     }
 }

@@ -11,9 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+using OPADotNet.Ast.Models;
+using OPADotNet.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OPADotNet
 {
@@ -22,5 +25,7 @@ namespace OPADotNet
         IPreparedPartial PreparePartial(string query);
 
         IPreparedEvaluation PrepareEvaluation(string query);
+
+        Task<IReadOnlyList<Policy>> GetPolicies();
     }
 }

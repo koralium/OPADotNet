@@ -12,9 +12,13 @@
  * limitations under the License.
  */
 using OPADotNet;
+using OPADotNet.Ast.Models;
+using OPADotNet.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OPADotNet.Embedded
 {
@@ -58,6 +62,20 @@ namespace OPADotNet.Embedded
             var preparedEval = new PreparedEvalEmbedded(OpaStore, query);
             _prepared.Add(new WeakReference<IPreparedEmbedded>(preparedEval));
             return preparedEval;
+        }
+
+        public Task<IReadOnlyList<Policy>> GetPolicies()
+        {
+            var policies = _opaStore.GetCompiler().GetPolicies();
+            List<Policy> output = new List<Policy>();
+            foreach (var module in _opaStore._modules)
+            {
+                if (policies.TryGetValue(module.Key, out var astPolicy))
+                {
+                    output.Add(new Policy(module.Key, module.Value, astPolicy));
+                }
+            }
+            return Task.FromResult<IReadOnlyList<Policy>>(output);
         }
     }
 }
