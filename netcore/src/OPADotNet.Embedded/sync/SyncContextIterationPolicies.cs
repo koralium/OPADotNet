@@ -13,6 +13,7 @@
  */
 using OPADotNet.Ast.Models;
 using OPADotNet.Embedded.utils;
+using OPADotNet.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

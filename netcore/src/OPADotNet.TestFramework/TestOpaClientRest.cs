@@ -13,6 +13,7 @@
  */
 using OPADotNet.Ast.Models;
 using OPADotNet.Embedded;
+using OPADotNet.Models;
 using OPADotNet.RestAPI;
 using System;
 using System.Collections.Generic;

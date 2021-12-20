@@ -13,6 +13,7 @@
  */
 using OPADotNet;
 using OPADotNet.Ast.Models;
+using OPADotNet.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,12 +72,7 @@ namespace OPADotNet.Embedded
             {
                 if (policies.TryGetValue(module.Key, out var astPolicy))
                 {
-                    output.Add(new Policy()
-                    {
-                        Ast = astPolicy,
-                        Id = module.Key,
-                        Raw = module.Value
-                    });
+                    output.Add(new Policy(module.Key, module.Value, astPolicy));
                 }
             }
             return Task.FromResult<IReadOnlyList<Policy>>(output);

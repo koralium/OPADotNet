@@ -1,4 +1,6 @@
 ﻿using NUnit.Framework;
+using OPADotNet.Ast.Models;
+using OPADotNet.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,15 +15,69 @@ namespace OPADotNet.Embedded.Tests
         {
             OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded();
             var txn = opaClientEmbedded.OpaStore.NewTransaction(true);
-            txn.UpsertPolicy("pol1", @"
+            var rawPolicy = @"
             package test
 
             allow = true
-            ");
+            ";
+            txn.UpsertPolicy("pol1", rawPolicy);
             txn.Commit();
 
             var policies = await opaClientEmbedded.GetPolicies();
 
+            var expected = new List<Policy>()
+            {
+                new Policy(
+                    "pol1.rego",
+                    rawPolicy,
+                    new AstPolicy()
+                    {
+                        Package = new AstPolicyPackage()
+                        {
+                            Path = new List<AstTerm>()
+                            {
+                                new AstTermVar()
+                                {
+                                    Value = "data"
+                                },
+                                new AstTermString()
+                                {
+                                    Value = "test"
+                                }
+                            }
+                        },
+                        Rules = new List<AstPolicyRule>()
+                        {
+                            new AstPolicyRule()
+                            {
+                                Body = new AstBody()
+                                {
+                                    Expressions = new List<AstExpression>()
+                                    {
+                                        new AstExpression()
+                                        {
+                                            Terms = new List<AstTerm>()
+                                            {
+                                                new AstTermBoolean(){ Value = true}
+                                            }
+                                        }
+                                    }
+                                },
+                                Head = new AstRuleHead()
+                                {
+                                    Name = "allow",
+                                    Value = new AstTermBoolean()
+                                    {
+                                        Value = true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                )
+            };
+
+            Assert.AreEqual(expected, policies);
         }
     }
 }
