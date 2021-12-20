@@ -25,6 +25,7 @@ namespace OPADotNet.Ast.Models
         Number,
         Boolean,
         Object,
-        Array
+        Array,
+        Set
     }
 }

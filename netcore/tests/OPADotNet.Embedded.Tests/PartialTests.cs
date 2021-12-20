@@ -22,6 +22,74 @@ namespace OPADotNet.Embedded.Tests
     public class PartialTests
     {
         [Test]
+        public async Task TestSet()
+        {
+            OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded();
+            OpaStore opaStore = opaClientEmbedded.OpaStore;
+            var txn = opaStore.NewTransaction(true);
+            txn.UpsertPolicy("policy", @"
+            package test_thing
+
+            violation[msg] {
+	            latestVersion := data.helm_charts.elasticsearch.version
+	            otherthing := data.otherdata[_]
+	            otherthing.name = input.chart
+	            input.version != latestVersion
+	            msg := ""Update to latest version""
+            }            
+            ");
+            txn.Commit();
+
+            var preparedPartial = opaClientEmbedded.PreparePartial("d = data.test_thing.violation");
+
+
+            var partialResult = await preparedPartial.Partial(new
+            {
+                version = "1.0",
+                chart = "elasticsearch"
+            }, new List<string>()
+            {
+                "data.helm_charts"
+            });
+
+            var expected = new AstQueries()
+            {
+                Queries = new List<AstBody>()
+                {
+                    new AstBody()
+                    {
+                        Expressions = new List<AstExpression>()
+                        {
+                            new AstExpression()
+                            {
+                                Terms = new List<AstTerm>()
+                                {
+                                    new AstTermRef()
+                                    {
+                                        Value = new List<AstTerm>()
+                                        {
+                                            new AstTermVar(){Value = "eq"}
+                                        }
+                                    },
+                                    new AstTermVar()
+                                    {
+                                        Value = "d"
+                                    },
+                                    new AstTermSet()
+                                    {
+                                        Value = new List<AstTerm>()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            Assert.AreEqual(expected, partialResult);
+        }
+
+        [Test]
         public async Task TestPartialWithModule()
         {
             OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded();

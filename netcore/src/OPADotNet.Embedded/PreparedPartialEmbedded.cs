@@ -56,6 +56,7 @@ namespace OPADotNet.Embedded
                 string err = RegoWrapper.GetString(result);
                 RegoWrapper.FreeString(result);
                 t.SetException(new InvalidOperationException(err));
+                return t.Task;
             }
 
             var content = RegoWrapper.GetString(result);
