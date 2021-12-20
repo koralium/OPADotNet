@@ -32,9 +32,9 @@ namespace OPADotNet.TestFramework
             _policies = policies;
         }
 
-        public override Task<List<Policy>> GetPolicies()
+        public override Task<IReadOnlyList<Policy>> GetPolicies()
         {
-            return Task.FromResult(_policies.ToList());
+            return Task.FromResult<IReadOnlyList<Policy>>(_policies.ToList());
         }
 
         public override IPreparedPartial PreparePartial(string query)

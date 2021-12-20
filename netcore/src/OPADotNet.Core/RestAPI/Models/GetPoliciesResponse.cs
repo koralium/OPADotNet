@@ -22,6 +22,6 @@ namespace OPADotNet.RestAPI.Models
     public class GetPoliciesResponse
     {
         [JsonPropertyName("result")]
-        public List<Policy> Result { get; set; }
+        public IReadOnlyList<Policy> Result { get; set; }
     }
 }

@@ -41,7 +41,7 @@ namespace OPADotNet.RestAPI
             _httpUrl = uri;
         }
 
-        public virtual async Task<List<Policy>> GetPolicies()
+        public virtual async Task<IReadOnlyList<Policy>> GetPolicies()
         {
             var httpClient = new HttpClient();
 
