@@ -1,0 +1,4 @@
+docker run -it --rm -v ${PWD}:/go/src/regosdk -w /go/src/regosdk/go/src -e CGO_ENABLED=1 docker.elastic.co/beats-dev/golang-crossbuild:1.16.4-main --build-cmd "go build -o ../../netcore/src/OPADotNet.Embedded/runtimes/linux-x64/native/regosdk.so -buildmode=c-shared" -p "linux/amd64"
+rm netcore/src/OPADotNet.Embedded/runtimes/linux-x64/native/regosdk.h
+docker run -it --rm -v ${PWD}:/go/src/regosdk -w /go/src/regosdk/go/src -e CGO_ENABLED=1 docker.elastic.co/beats-dev/golang-crossbuild:1.16.4-main --build-cmd "go build -o ../../netcore/src/OPADotNet.Embedded/runtimes/linux-x86/native/regosdk.so -buildmode=c-shared" -p "linux/386"
+rm netcore/src/OPADotNet.Embedded/runtimes/linux-x86/native/regosdk.h
