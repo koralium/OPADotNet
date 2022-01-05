@@ -13,6 +13,7 @@
  */
 using OPADotNet.Ast;
 using OPADotNet.Ast.Models;
+using OPADotNet.Core.Models;
 using OPADotNet.Embedded.Internal;
 using System;
 using System.Collections.Generic;
@@ -43,13 +44,13 @@ namespace OPADotNet.Embedded
             this.Update();
         }
 
-        public Task<AstQueries> Partial(object input, IEnumerable<string> unknowns)
+        public Task<PartialResult> Partial(object input, IEnumerable<string> unknowns, bool explain = false)
         {
             var unknownsArray = unknowns.ToArray();
             var inputJson = JsonSerializer.Serialize(input, serializerOptions);
 
-            var t = new TaskCompletionSource<AstQueries>();
-            int result = RegoWrapper.PreparedPartial(_preparedQueryId, inputJson, unknownsArray, unknownsArray.Length);
+            var t = new TaskCompletionSource<PartialResult>();
+            int result = RegoWrapper.PreparedPartial(_preparedQueryId, inputJson, unknownsArray, unknownsArray.Length, explain);
 
             if (result < 0)
             {
@@ -61,7 +62,7 @@ namespace OPADotNet.Embedded
 
             var content = RegoWrapper.GetString(result);
 
-            t.SetResult(PartialJsonConverter.ReadPartialQuery(content));
+            t.SetResult(PartialJsonConverter.ReadPartialResult(content));
             return t.Task;
         }
 

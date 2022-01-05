@@ -31,13 +31,13 @@ namespace OPADotNet.Benchmarks
 
             txn.Commit();
             preparedPartial = opaClientEmbedded.PreparePartial("data.test.allow == true");
-            astQueries = await preparedPartial.Partial(new
+            astQueries = (await preparedPartial.Partial(new
             {
                 subject = new
                 {
                     name = "test"
                 }
-            }, new List<string>() { "data.t" });
+            }, new List<string>() { "data.t" })).Result;
         }
 
         [Benchmark]

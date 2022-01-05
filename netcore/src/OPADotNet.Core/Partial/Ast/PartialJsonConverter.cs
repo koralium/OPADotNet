@@ -12,6 +12,8 @@
  * limitations under the License.
  */
 using OPADotNet.Ast.Models;
+using OPADotNet.Core.Models;
+using OPADotNet.Core.Partial.Ast.Converters;
 using OPADotNet.Partial.Ast.Converters;
 using OPADotNet.RestAPI.Models;
 using System;
@@ -46,6 +48,7 @@ namespace OPADotNet.Ast
             converters.Add(new PartialBodyConverter());
             converters.Add(new ObjectPropertyConverter());
             converters.Add(new PartialExpressionConverter());
+            converters.Add(new ExplanationConverter());
         }
 
         public static string SerializePolicies(GetPoliciesResponse getPoliciesResponse)
@@ -61,6 +64,11 @@ namespace OPADotNet.Ast
         public static GetPoliciesResponse ReadPolicyResponse(string json)
         {
             return JsonSerializer.Deserialize<GetPoliciesResponse>(json, _serializerOptions);
+        }
+
+        internal static PartialResult ReadPartialResult(string json)
+        {
+            return JsonSerializer.Deserialize<PartialResult>(json, _serializerOptions);
         }
 
         internal static CompileResponse ReadCompileResponse(string json)

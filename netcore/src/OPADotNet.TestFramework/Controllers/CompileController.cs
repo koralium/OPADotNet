@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 using Microsoft.AspNetCore.Mvc;
+using OPADotNet.Core.Models;
 using OPADotNet.RestAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -31,15 +32,12 @@ namespace OPADotNet.TestFramework.Controllers
         }
 
         [HttpPost]
-        public async Task<CompileResponse> Post([FromBody] CompileRequest compileRequest)
+        public async Task<PartialResult> Post([FromBody] CompileRequest compileRequest)
         {
             var prepared = _testClient.PreparePartial(compileRequest.Query);
             var queries = await prepared.Partial(compileRequest.Input, compileRequest.Unknowns);
 
-            return new CompileResponse()
-            {
-                Result = queries
-            };
+            return queries;
         }
     }
 }

@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 using OPADotNet.Ast.Models;
+using OPADotNet.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +37,7 @@ namespace OPADotNet.RestAPI
             //Nothing to dispose
         }
 
-        public Task<AstQueries> Partial(object input, IEnumerable<string> unknowns)
+        public Task<PartialResult> Partial(object input, IEnumerable<string> unknowns, bool explain = false)
         {
             return _restOpaClient.Compile(_query, input, unknowns.ToList());
         }

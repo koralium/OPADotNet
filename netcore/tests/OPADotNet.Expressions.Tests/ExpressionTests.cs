@@ -38,11 +38,11 @@ namespace OPADotNet.Expressions.Tests
             txn.UpsertPolicy(Guid.NewGuid().ToString(), policyText);
             txn.Commit();
             var preparedPartial = opaClientEmbedded.PreparePartial(query);
-            var astQueries = await preparedPartial.Partial(input, new List<string>()
+            var partialResult = await preparedPartial.Partial(input, new List<string>()
             {
                 unknown
             });
-            return astQueries;
+            return partialResult.Result;
         }
 
         private async Task<Func<object, bool>> GetFunc(string policyText, string query, object input, string unknown, Type t)

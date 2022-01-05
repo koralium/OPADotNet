@@ -94,14 +94,17 @@ namespace OPADotNet.AspNetCore.Requirements
             input.Extensions.Add(requirement.GetInputResourceName(), context.Resource);
 
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
-            var result = await preparedPartial.Partial(input, requirement.GetUnknowns());
+            var result = await preparedPartial.Partial(input, requirement.GetUnknowns(), true);
 
-            if (result.Queries == null)
+            if (result.Result.Queries == null)
             {
+#if NET
+                context.Fail(new OpaAuthorizationFailureReason(this, "OPA Authorization failed.", result.Explanation));
+#endif
                 return;
             }
 
-            var expr = await _expressionConverter.ToExpression(result, requirement.GetUnknown(), context.Resource.GetType());
+            var expr = await _expressionConverter.ToExpression(result.Result, requirement.GetUnknown(), context.Resource.GetType());
 
             var func = expr.Compile();
 
@@ -116,14 +119,17 @@ namespace OPADotNet.AspNetCore.Requirements
             var input = GetInput(context, requirement);
 
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
-            var result = await preparedPartial.Partial(input, requirement.GetUnknowns());
+            var result = await preparedPartial.Partial(input, requirement.GetUnknowns(), true);
 
-            if (result.Queries == null)
+            if (result.Result.Queries == null)
             {
+#if NET
+                context.Fail(new OpaAuthorizationFailureReason(this, "OPA Authorization failed.", result.Explanation));
+#endif
                 return;
             }
 
-            var expression = await _expressionConverter.ToExpression(result, requirement.GetUnknown(), authorizeQueryableHolder.ParameterExpression, authorizeQueryableHolder.Options);
+            var expression = await _expressionConverter.ToExpression(result.Result, requirement.GetUnknown(), authorizeQueryableHolder.ParameterExpression, authorizeQueryableHolder.Options);
             authorizeQueryableHolder.AddFilter(expression);
             context.Succeed(requirement);
         }
@@ -134,14 +140,17 @@ namespace OPADotNet.AspNetCore.Requirements
             input.Extensions.Add(requirement.GetInputResourceName(), holder.Resource);
 
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
-            var result = await preparedPartial.Partial(input, requirement.GetUnknowns());
+            var result = await preparedPartial.Partial(input, requirement.GetUnknowns(), true);
 
-            if (result.Queries == null)
+            if (result.Result.Queries == null)
             {
+#if NET
+                context.Fail(new OpaAuthorizationFailureReason(this, "OPA Authorization failed.", result.Explanation));
+#endif
                 return;
             }
 
-            var expr = await _expressionConverter.ToExpression(result, requirement.GetUnknown(), holder.Data.GetType());
+            var expr = await _expressionConverter.ToExpression(result.Result, requirement.GetUnknown(), holder.Data.GetType());
 
             var func = expr.Compile();
 
@@ -156,12 +165,19 @@ namespace OPADotNet.AspNetCore.Requirements
             var input = GetInput(context, requirement);
 
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
-            var result = await preparedPartial.Partial(input, requirement.GetUnknowns());
+            var result = await preparedPartial.Partial(input, requirement.GetUnknowns(), true);
 
-            if (result.Queries != null)
+            //context.Fail(new AuthorizationFailureReason(this, "Message"));
+            if (result.Result.Queries != null)
             {
                 context.Succeed(requirement);
             }
+#if NET
+            else
+            {
+                context.Fail(new OpaAuthorizationFailureReason(this, "OPA Authorization failed.", result.Explanation));
+            }
+#endif
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, OpaPolicyRequirement requirement)

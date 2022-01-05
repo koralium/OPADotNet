@@ -199,7 +199,7 @@ namespace OPADotNet.TestFramework.Tests
                 }
             };
 
-            Assert.AreEqual(expected, partialResult);
+            Assert.AreEqual(expected, partialResult.Result);
         }
 
         [Test]

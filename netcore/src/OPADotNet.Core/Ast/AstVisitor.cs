@@ -139,5 +139,10 @@ namespace OPADotNet.Ast
             Visit(termSet.Value);
             return default;
         }
+
+        public virtual T VisitTermNull(AstTermNull termNull)
+        {
+            return default;
+        }
     }
 }
