@@ -30,21 +30,24 @@ namespace OPADotNet.AspNetCore.Input
         [JsonPropertyName("claims")]
         public List<OpaInputUserClaim> Claims { get; set; }
 
+        [JsonPropertyName("isAuthenticated")]
+        public bool IsAuthenticated { get; set; }
+
         public static OpaInputUser FromPrincipal(ClaimsPrincipal claimsPrincipal)
         {
-            if (!claimsPrincipal?.Identity?.IsAuthenticated ?? true)
-            {
-                return null;
-            }
             var output = new OpaInputUser()
             {
-                Name = claimsPrincipal.Identity.Name,
-                Claims = new List<OpaInputUserClaim>()
+                Name = claimsPrincipal?.Identity?.Name,
+                Claims = new List<OpaInputUserClaim>(),
+                IsAuthenticated = claimsPrincipal?.Identity?.IsAuthenticated ?? false
             };
 
-            foreach (var claim in claimsPrincipal.Claims)
+            if (claimsPrincipal?.Claims != null)
             {
-                output.Claims.Add(OpaInputUserClaim.FromClaim(claim));
+                foreach (var claim in claimsPrincipal.Claims)
+                {
+                    output.Claims.Add(OpaInputUserClaim.FromClaim(claim));
+                }
             }
 
             return output;
