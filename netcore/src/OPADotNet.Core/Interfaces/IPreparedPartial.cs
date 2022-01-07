@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 using OPADotNet.Ast.Models;
+using OPADotNet.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -24,6 +25,6 @@ namespace OPADotNet
     /// </summary>
     public interface IPreparedPartial : IDisposable
     {
-        public Task<AstQueries> Partial(object input, IEnumerable<string> unknowns);
+        public Task<PartialResult> Partial(object input, IEnumerable<string> unknowns, bool explain = false);
     }
 }

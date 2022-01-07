@@ -85,7 +85,7 @@ allow {
                 test = "abc"
             }, new List<string>());
 
-            Assert.That(partialResult.Queries.Count == 1 && partialResult.Queries[0].Expressions.Count == 0);
+            Assert.That(partialResult.Result.Queries.Count == 1 && partialResult.Result.Queries[0].Expressions.Count == 0);
 
             partialResult = await prepared.Partial(new
             {
@@ -93,7 +93,7 @@ allow {
                 test = "abc"
             }, new List<string>());
 
-            Assert.That(partialResult.Queries == null);
+            Assert.That(partialResult.Result.Queries == null);
         }
     }
 }

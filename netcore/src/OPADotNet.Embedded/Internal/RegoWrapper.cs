@@ -44,7 +44,7 @@ namespace OPADotNet.Embedded.Internal
         public delegate void EvaluateCallbackDelegate(string val);
 
         [DllImport("regosdk", EntryPoint = "PreparedPartial", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int PreparedPartial(int partialQueryId, string input, string[] unknowns, int unknownsLength);
+        public static extern int PreparedPartial(int partialQueryId, string input, string[] unknowns, int unknownsLength, bool trace);
 
         [DllImport("regosdk", EntryPoint = "PrepareEvaluation", CharSet = CharSet.Ansi)]
         public static extern int PrepareEvaluation(int compilerId, int storeId, string query);

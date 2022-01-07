@@ -13,6 +13,7 @@
  */
 using OPADotNet.Ast;
 using OPADotNet.Ast.Models;
+using OPADotNet.Core.Models;
 using OPADotNet.Core.RestAPI;
 using OPADotNet.Core.RestAPI.Models;
 using OPADotNet.Models;
@@ -79,7 +80,7 @@ namespace OPADotNet.RestAPI
             return new RestPreparedPartial(this, query);
         }
 
-        internal virtual async Task<AstQueries> Compile(string query, object input, List<string> unknowns)
+        internal virtual async Task<PartialResult> Compile(string query, object input, List<string> unknowns)
         {
             var httpClient = new HttpClient();
             var result = await httpClient.PostAsJsonAsync(new Uri(_httpUrl, "/v1/compile"), new CompileRequest()
@@ -90,7 +91,7 @@ namespace OPADotNet.RestAPI
             });
 
             var content = await result.Content.ReadAsStringAsync();
-            return PartialJsonConverter.ReadCompileResponse(content).Result;
+            return PartialJsonConverter.ReadPartialResult(content);
         }
 
         internal virtual async Task<IEnumerable<TBinding>> Query<TBinding>(string query, object input)

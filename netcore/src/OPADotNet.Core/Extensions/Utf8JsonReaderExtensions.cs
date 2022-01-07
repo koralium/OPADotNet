@@ -86,6 +86,12 @@ namespace OPADotNet.Extensions
             return reader.GetDecimal();
         }
 
+        public static int ReadGetInt(ref this Utf8JsonReader reader)
+        {
+            reader.ReadCheckType(JsonTokenType.Number);
+            return reader.GetInt32();
+        }
+
         public static bool ReadGetBoolean(ref this Utf8JsonReader reader)
         {
             reader.ReadThrow();

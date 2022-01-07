@@ -86,7 +86,7 @@ namespace OPADotNet.Embedded.Tests
                 }
             };
 
-            Assert.AreEqual(expected, partialResult);
+            Assert.AreEqual(expected, partialResult.Result);
         }
 
         [Test]
@@ -262,7 +262,7 @@ namespace OPADotNet.Embedded.Tests
                 }
             };
 
-            Assert.AreEqual(expected, result);
+            Assert.AreEqual(expected, result.Result);
             
         }
 

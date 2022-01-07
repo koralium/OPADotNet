@@ -46,8 +46,13 @@ func getPreparedPartial(partialQueryId int) rego.PreparedPartialQuery {
 }
 
 //export PreparedPartial
-func PreparedPartial(partialId int, input *C.char, unknowns **C.char, unknownsLength C.int) C.int {
+func PreparedPartial(partialId int, input *C.char, unknowns **C.char, unknownsLength C.int, trace C.char) C.int {
 	unknownsArray := GoStrings(unknownsLength, unknowns)
+
+	useTrace := false
+	if trace > 0 {
+		useTrace = true
+	}
 
 	inputJson := C.GoString(input)
 	var inputData interface{}
@@ -55,7 +60,7 @@ func PreparedPartial(partialId int, input *C.char, unknowns **C.char, unknownsLe
 
 	prepared := getPreparedPartial(partialId)
 
-	pq, err := preparedPartial(prepared, inputData, unknownsArray)
+	pq, err := preparedPartial(prepared, inputData, unknownsArray, useTrace)
 
 	if err != nil {
 		return addError(err.Error())

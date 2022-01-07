@@ -26,6 +26,12 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 6.0.x
+    - name: Build Native
+      run: ./build_native.ps1
+      shell: pwsh
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      if: ${{ matrix.os == 'ubuntu-latest' }}
     - name: Build OSX Native
       run: ./build_native_osx.ps1
       shell: pwsh
