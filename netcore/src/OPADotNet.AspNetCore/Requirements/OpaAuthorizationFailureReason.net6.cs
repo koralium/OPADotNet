@@ -6,7 +6,7 @@ using System.Text;
 
 namespace OPADotNet.AspNetCore
 {
-    internal class OpaAuthorizationFailureReason : AuthorizationFailureReason
+    public class OpaAuthorizationFailureReason : AuthorizationFailureReason
     {
         public IReadOnlyList<ExplanationNode> Explanation { get; }
 
