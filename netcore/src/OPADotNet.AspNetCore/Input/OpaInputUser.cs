@@ -28,7 +28,7 @@ namespace OPADotNet.AspNetCore.Input
         public string Name { get; set; }
 
         [JsonPropertyName("claims")]
-        public List<OpaInputUserClaim> Claims { get; set; }
+        public Dictionary<string, List<string>> Claims { get; set; }
 
         [JsonPropertyName("isAuthenticated")]
         public bool IsAuthenticated { get; set; }
@@ -38,7 +38,7 @@ namespace OPADotNet.AspNetCore.Input
             var output = new OpaInputUser()
             {
                 Name = claimsPrincipal?.Identity?.Name,
-                Claims = new List<OpaInputUserClaim>(),
+                Claims = new Dictionary<string, List<string>>(),
                 IsAuthenticated = claimsPrincipal?.Identity?.IsAuthenticated ?? false
             };
 
@@ -46,7 +46,12 @@ namespace OPADotNet.AspNetCore.Input
             {
                 foreach (var claim in claimsPrincipal.Claims)
                 {
-                    output.Claims.Add(OpaInputUserClaim.FromClaim(claim));
+                    if (!output.Claims.TryGetValue(claim.Type, out var claims))
+                    {
+                        claims = new List<string>();
+                        output.Claims.Add(claim.Type, claims);
+                    }
+                    claims.Add(claim.Value);
                 }
             }
 

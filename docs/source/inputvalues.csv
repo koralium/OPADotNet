@@ -1,8 +1,7 @@
 input.subject; The current user
 input.subject.name; The current user name, translated from claimsPrincipal.Identity.Name
-input.subject.claims[]; An array of the current user claims
-input.subject.claims[_].type; The type that the claim is, for example "role".
-input.subject.claims[_].value; The value of the claim.
+input.subject.claims[_]; A dictionary of the current user claims
+input.subject.claims.{claimsName}[_]; An array of the values on a specfic claim.
 input.subject.isAuthenticated; Is the current user authenticated or not.
 input.operation; The operation name set when configuring the policy.
 input.request; Contains an object with information of the current http request
