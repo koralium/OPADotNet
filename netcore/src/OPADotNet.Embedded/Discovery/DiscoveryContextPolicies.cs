@@ -22,11 +22,13 @@ namespace OPADotNet.Embedded.Discovery
     {
         private readonly OpaClientEmbedded _opaClientEmbedded;
         private readonly DiscoveryHandler _discoveryHandler;
+        private readonly SyncContext _syncContext;
 
-        internal DiscoveryContextPolicies(OpaClientEmbedded opaClientEmbedded, DiscoveryHandler discoveryHandler) : base(opaClientEmbedded, null, null)
+        internal DiscoveryContextPolicies(OpaClientEmbedded opaClientEmbedded, DiscoveryHandler discoveryHandler, SyncContext syncContext) : base(opaClientEmbedded, null, null, syncContext)
         {
             _opaClientEmbedded = opaClientEmbedded;
             _discoveryHandler = discoveryHandler;
+            _syncContext = syncContext;
         }
 
         public override SyncContextIterationData Next()
@@ -35,15 +37,10 @@ namespace OPADotNet.Embedded.Discovery
 
             foreach(var addedPolicy in AddedPolicies)
             {
-                syncPolicies.Add(new SyncPolicy()
-                {
-                    DataSets = new HashSet<string>(),
-                    PolicyName = addedPolicy.Id,
-                    Raw = addedPolicy.Raw
-                });
+                syncPolicies.Add(new SyncPolicy(addedPolicy.Id, new HashSet<string>(), addedPolicy.Raw));
             }
 
-            return new DiscoveryContextData(_opaClientEmbedded, syncPolicies, _discoveryHandler);
+            return new DiscoveryContextData(_opaClientEmbedded, syncPolicies, _discoveryHandler, _syncContext);
         }
     }
 }

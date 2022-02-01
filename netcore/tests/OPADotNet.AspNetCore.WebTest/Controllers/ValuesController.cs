@@ -81,7 +81,11 @@ namespace OPADotNet.AspNetCore.WebTest.Controllers
             
             if (!authResult.Succeeded)
             {
+#if NET
+                return Unauthorized(authResult.Failure?.FailureReasons.FirstOrDefault()?.Message);
+#else
                 return Unauthorized();
+#endif
             }
 
             return Ok(authResult.Queryable);

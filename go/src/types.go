@@ -17,6 +17,7 @@ type TraceEventV1 struct {
 	Type     string      `json:"type"`
 	Node     interface{} `json:"node"`
 	Locals   BindingsV1  `json:"locals"`
+	Location LocationV1  `json:"location"`
 	Message  string      `json:"message,omitempty"`
 }
 
@@ -27,6 +28,11 @@ type BindingsV1 []*BindingV1
 type BindingV1 struct {
 	Key   *ast.Term `json:"key"`
 	Value *ast.Term `json:"value"`
+}
+
+type LocationV1 struct {
+	File string `json:"file"`
+	Row  int    `json:"row"`
 }
 
 type TraceV1Raw []TraceEventV1
@@ -50,15 +56,38 @@ func newPrettyTraceV1(trace []*topdown.Event) (TraceV1, error) {
 	return TraceV1(json.RawMessage(b)), nil
 }
 
+func NewLocationV1(loc *ast.Location) LocationV1 {
+
+	if loc == nil {
+		return LocationV1{
+			File: "",
+			Row:  -1,
+		}
+	}
+
+	fileName := "query"
+
+	if loc.File != "" {
+		fileName = loc.File
+	}
+
+	return LocationV1{
+		File: fileName,
+		Row:  loc.Row,
+	}
+}
+
 func newRawTraceV1(trace []*topdown.Event) (TraceV1Raw, error) {
 	result := TraceV1Raw(make([]TraceEventV1, len(trace)))
 	for i := range trace {
+
 		result[i] = TraceEventV1{
 			Op:       strings.ToLower(string(trace[i].Op)),
 			QueryID:  trace[i].QueryID,
 			ParentID: trace[i].ParentID,
 			Locals:   NewBindingsV1(trace[i].Locals),
 			Message:  trace[i].Message,
+			Location: NewLocationV1(trace[i].Location),
 		}
 		if trace[i].Node != nil {
 			result[i].Type = ast.TypeName(trace[i].Node)

@@ -27,12 +27,14 @@ namespace OPADotNet.Embedded.sync
         private readonly List<SyncPolicyDescriptor> _modules;
         private readonly List<Policy> _addedPolicies = new List<Policy>();
         private readonly Dictionary<string, SyncPolicy> _existingPolices;
+        private readonly SyncContext _syncContext;
 
-        internal SyncContextIterationPolicies(OpaClientEmbedded opaClientEmbedded, List<SyncPolicyDescriptor> modules, Dictionary<string, SyncPolicy> existingPolices)
+        internal SyncContextIterationPolicies(OpaClientEmbedded opaClientEmbedded, List<SyncPolicyDescriptor> modules, Dictionary<string, SyncPolicy> existingPolices, SyncContext syncContext)
         {
             _opaClientEmbedded = opaClientEmbedded;
             _modules = modules;
             _existingPolices = existingPolices;
+            _syncContext = syncContext;
         }
 
         protected IEnumerable<Policy> AddedPolicies => _addedPolicies;
@@ -65,7 +67,7 @@ namespace OPADotNet.Embedded.sync
         {
             var (usedPolicies, dataSets) = GetUsedPoliciesAndGetDataSets(_addedPolicies);
             var tree = DataSetTreeBuilder.BuildDataSetTree(dataSets);
-            return new SyncContextIterationData(_opaClientEmbedded, usedPolicies, tree);
+            return new SyncContextIterationData(_opaClientEmbedded, usedPolicies, tree, _syncContext);
         }
 
         /// <summary>

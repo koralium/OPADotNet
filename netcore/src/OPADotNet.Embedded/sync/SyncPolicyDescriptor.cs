@@ -17,14 +17,20 @@ using System.Text;
 
 namespace OPADotNet.Embedded.sync
 {
-    internal class SyncPolicyDescriptor
+    public class SyncPolicyDescriptor
     {
-        public string PolicyName { get; set; }
+        internal SyncPolicyDescriptor(string policyName, string unknown = null)
+        {
+            PolicyName = policyName;
+            Unknown = unknown;
+        }
+
+        public string PolicyName { get; }
 
         /// <summary>
         /// The unknown for this policy
         /// </summary>
-        public string Unknown { get; set; }
+        public string Unknown { get; }
 
         internal bool Found { get; set; }
 

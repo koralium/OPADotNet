@@ -19,7 +19,7 @@ namespace OPADotNet.Core.Extensions
 {
     internal static class ListExtensions
     {
-        public static bool AreEqual<T>(this List<T> list, List<T> other)
+        public static bool AreEqual<T>(this IReadOnlyList<T> list, IReadOnlyList<T> other)
         {
             if (list == null && other == null)
             {

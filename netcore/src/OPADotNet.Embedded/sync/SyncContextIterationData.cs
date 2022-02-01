@@ -27,13 +27,15 @@ namespace OPADotNet.Embedded.sync
         private readonly List<SyncPolicy> _policies;
         private readonly OpaTransaction _opaTransaction;
         private readonly DataSetNode _tree;
+        private readonly SyncContext _syncContext;
 
-        internal SyncContextIterationData(OpaClientEmbedded opaClientEmbedded, List<SyncPolicy> policies, DataSetNode tree)
+        internal SyncContextIterationData(OpaClientEmbedded opaClientEmbedded, List<SyncPolicy> policies, DataSetNode tree, SyncContext syncContext)
         {
             _opaClientEmbedded = opaClientEmbedded;
             _opaTransaction = _opaClientEmbedded.OpaStore.NewTransaction(true);
             _policies = policies;
             _tree = tree;
+            _syncContext = syncContext;
         }
 
         public IReadOnlyDictionary<string, DataSetNode> DataSets => _tree.Children;
@@ -52,7 +54,7 @@ namespace OPADotNet.Embedded.sync
         /// <summary>
         /// Mark that the sync iteration is done, and the changes will be propagated to the embedded OPA server
         /// </summary>
-        public virtual Task Done()
+        public virtual async Task Done()
         {
             //Write the policies into the store
             foreach (var usedPolicy in _policies)
@@ -62,8 +64,7 @@ namespace OPADotNet.Embedded.sync
 
             //Commit all the data changes and policies
             _opaTransaction.Commit();
-
-            return Task.CompletedTask;
+            await _syncContext.Done();
         }
     }
 }

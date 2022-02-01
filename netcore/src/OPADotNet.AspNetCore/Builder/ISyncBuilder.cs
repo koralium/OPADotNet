@@ -23,9 +23,9 @@ namespace OPADotNet.AspNetCore.Builder
     {
         IServiceCollection Services { get; }
 
-        ISyncBuilder AddSyncService<T>(T service) where T : ISyncService;
+        ISyncBuilder AddSyncService<T>(T service) where T: ISyncService;
 
-        ISyncBuilder AddSyncService<T>() where T : ISyncService;
+        ISyncBuilder AddSyncService<T>() where T: ISyncService;
 
         ISyncBuilder AddSyncService(Type type);
     }

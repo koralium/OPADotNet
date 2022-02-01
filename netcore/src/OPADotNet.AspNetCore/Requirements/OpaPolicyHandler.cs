@@ -16,9 +16,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OPADotNet.AspNetCore.Extensions;
 using OPADotNet.AspNetCore.Input;
+using OPADotNet.AspNetCore.Reasons;
 using OPADotNet.Ast.Models;
+using OPADotNet.Core.Models;
 using OPADotNet.Embedded.sync;
 using OPADotNet.Expressions;
+using OPADotNet.Reasons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,31 +37,25 @@ namespace OPADotNet.AspNetCore.Requirements
         private readonly ExpressionConverter _expressionConverter;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly SyncHandler _syncHandler;
-
-        public OpaPolicyHandler(
-            PreparedPartialStore preparedPartialStore,
-            ExpressionConverter expressionConverter,
-            ILogger<OpaPolicyHandler> logger,
-            IHttpContextAccessor httpContextAccessor)
-        {
-            _preparedPartialStore = preparedPartialStore;
-            _logger = logger;
-            _expressionConverter = expressionConverter;
-            _httpContextAccessor = httpContextAccessor;
-        }
+        private readonly IReasonHandler _reasonHandler;
+        private readonly IReasonFormatter _reasonFormatter;
 
         public OpaPolicyHandler(
             PreparedPartialStore preparedPartialStore,
             ExpressionConverter expressionConverter,
             ILogger<OpaPolicyHandler> logger,
             IHttpContextAccessor httpContextAccessor,
-            SyncHandler syncHandler)
+            SyncHandler syncHandler = default,
+            IReasonHandler reasonHandler = default,
+            IReasonFormatter reasonFormatter = default)
         {
             _preparedPartialStore = preparedPartialStore;
             _logger = logger;
             _expressionConverter = expressionConverter;
-            _syncHandler = syncHandler;
             _httpContextAccessor = httpContextAccessor;
+            _syncHandler = syncHandler;
+            _reasonHandler = reasonHandler;
+            _reasonFormatter = reasonFormatter;
         }
 
         private OpaInput GetInput(AuthorizationHandlerContext context, OpaPolicyRequirement requirement)
@@ -87,19 +84,31 @@ namespace OPADotNet.AspNetCore.Requirements
             return opaInput;
         }
 
+        private string GenerateReason(string query, PartialResult result)
+        {
+            if (_reasonHandler != null)
+            {
+                if (_reasonHandler.TryGetReasonMessage(query, result.Explanation, out var reasonMessage))
+                {
+                    return _reasonFormatter.FormatReason(reasonMessage);
+                }
+            }
+            return "You are not authorized.";
+        }
+
         private async Task AuthorizeResource(AuthorizationHandlerContext context, OpaPolicyRequirement requirement)
         {
             var input = GetInput(context, requirement);
             //Add the resource as an input, it is up to the user if they want to validate it using input or data
             input.Extensions.Add(requirement.GetInputResourceName(), context.Resource);
-
+            
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
             var result = await preparedPartial.Partial(input, requirement.GetUnknowns(), true);
 
             if (result.Result.Queries == null)
             {
 #if NET
-                context.Fail(new OpaAuthorizationFailureReason(this, "OPA Authorization failed.", result.Explanation));
+                context.Fail(new OpaAuthorizationFailureReason(this, GenerateReason(requirement.GetQuery(), result), result.Explanation));
 #endif
                 return;
             }
@@ -124,7 +133,7 @@ namespace OPADotNet.AspNetCore.Requirements
             if (result.Result.Queries == null)
             {
 #if NET
-                context.Fail(new OpaAuthorizationFailureReason(this, "OPA Authorization failed.", result.Explanation));
+                context.Fail(new OpaAuthorizationFailureReason(this, GenerateReason(requirement.GetQuery(), result), result.Explanation));
 #endif
                 return;
             }
@@ -145,7 +154,7 @@ namespace OPADotNet.AspNetCore.Requirements
             if (result.Result.Queries == null)
             {
 #if NET
-                context.Fail(new OpaAuthorizationFailureReason(this, "OPA Authorization failed.", result.Explanation));
+                context.Fail(new OpaAuthorizationFailureReason(this, GenerateReason(requirement.GetQuery(), result), result.Explanation));
 #endif
                 return;
             }
@@ -175,7 +184,7 @@ namespace OPADotNet.AspNetCore.Requirements
 #if NET
             else
             {
-                context.Fail(new OpaAuthorizationFailureReason(this, "OPA Authorization failed.", result.Explanation));
+                context.Fail(new OpaAuthorizationFailureReason(this, GenerateReason(requirement.GetQuery(), result), result.Explanation));
             }
 #endif
         }

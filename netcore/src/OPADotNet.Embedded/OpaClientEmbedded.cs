@@ -12,7 +12,11 @@
  * limitations under the License.
  */
 using OPADotNet;
+using OPADotNet.Ast;
 using OPADotNet.Ast.Models;
+using OPADotNet.Core.Models;
+using OPADotNet.Embedded.Internal;
+using OPADotNet.Embedded.utils;
 using OPADotNet.Models;
 using System;
 using System.Collections.Generic;
@@ -62,6 +66,17 @@ namespace OPADotNet.Embedded
             var preparedEval = new PreparedEvalEmbedded(OpaStore, query);
             _prepared.Add(new WeakReference<IPreparedEmbedded>(preparedEval));
             return preparedEval;
+        }
+
+        /// <summary>
+        /// Does a partial evaluation with all used data sources as unknown together with the input.
+        /// This allows to get a picture of what data the policy uses and how its execution will be handled.
+        /// </summary>
+        /// <param name="query">The query to do the partial evaluation on.</param>
+        /// <returns></returns>
+        public Task<PartialResult> FullPartial(string query)
+        {
+            return FullPartialUtils.FullPartial(this, query);
         }
 
         public Task<IReadOnlyList<Policy>> GetPolicies()

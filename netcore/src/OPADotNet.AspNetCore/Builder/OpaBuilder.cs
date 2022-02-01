@@ -12,8 +12,10 @@
  * limitations under the License.
  */
 using Microsoft.Extensions.DependencyInjection;
+using OPADotNet.AspNetCore.Reasons;
 using OPADotNet.Embedded.Discovery;
 using OPADotNet.Embedded.sync;
+using OPADotNet.Reasons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,12 +27,16 @@ namespace OPADotNet.AspNetCore.Builder
     {
         private string _opaServerUrl;
         private bool _useEmbedded = false;
-        private SyncOptions _syncOptions;
         private DiscoveryOptions _discoveryOptions;
+        private readonly SyncBuilder _syncBuilder;
+
+        private bool _syncAdded = false;
+        private bool _useReasons = true;
 
         internal OpaBuilder(IServiceCollection services)
         {
             Services = services;
+            _syncBuilder = new SyncBuilder(Services);
         }
 
         public IServiceCollection Services { get; }
@@ -47,14 +53,18 @@ namespace OPADotNet.AspNetCore.Builder
 
         public OpaBuilder AddSync(Action<ISyncBuilder> builder)
         {
-            if (_syncOptions != null)
+            if (_syncAdded)
             {
                 throw new InvalidOperationException("AddSync can only be called once");
             }
+            builder?.Invoke(_syncBuilder);
+            _syncAdded = true;
+            return this;
+        }
 
-            SyncBuilder syncBuilder = new SyncBuilder(Services);
-            builder?.Invoke(syncBuilder);
-            _syncOptions = syncBuilder.Build();
+        public OpaBuilder UseReasons(bool useReasons = true)
+        {
+            _useReasons = useReasons;
             return this;
         }
 
@@ -92,12 +102,21 @@ namespace OPADotNet.AspNetCore.Builder
                 url = new Uri(_opaServerUrl);
             }
 
+            if (_useReasons)
+            {
+                _syncBuilder.AddSyncDoneHandler<ReasonCompileHandler>();
+                Services.AddSingleton<IReasonHandler, ReasonHandler>();
+                Services.AddSingleton<IReasonFormatter, DefaultReasonFormatter>();
+            }
+
+            var syncOptions = _syncBuilder.Build();
+
             if (_opaServerUrl != null && _useEmbedded)
             {
                 throw new InvalidOperationException("Cannot run both embedded mode and Opa server mode.");
             }
 
-            if (_opaServerUrl != null && (_syncOptions.SyncServices.Count > 0))
+            if (_opaServerUrl != null && (syncOptions.SyncServices.Count > 0))
             {
                 throw new InvalidOperationException("Cannot run both policy and data sync with opa server mode.");
             }
@@ -105,7 +124,12 @@ namespace OPADotNet.AspNetCore.Builder
             //We always use embedded mode if OPA server is not entered.
             bool embeddedMode = _opaServerUrl == null;
 
-            return new OpaOptions(url, embeddedMode, _syncOptions, _discoveryOptions);
+            if (_useReasons && !embeddedMode)
+            {
+                throw new InvalidOperationException("Reasons only work in embedded mode.");
+            }
+
+            return new OpaOptions(url, embeddedMode, syncOptions, _discoveryOptions);
         }
     }
 }

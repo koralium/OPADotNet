@@ -33,12 +33,8 @@ namespace OPADotNet.Embedded.Tests
             OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded();
             SyncContext syncContext = new SyncContext(new List<SyncPolicyDescriptor>()
             {
-                new SyncPolicyDescriptor()
-                {
-                    PolicyName = "example",
-                    Unknown = "reports"
-                }
-            }, opaClientEmbedded);
+                new SyncPolicyDescriptor("example", "reports")
+            }, opaClientEmbedded, new List<Type>(), null);
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             await tarGzSync.FullLoad(syncContext, cancellationTokenSource.Token);

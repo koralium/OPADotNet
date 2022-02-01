@@ -29,5 +29,8 @@ namespace OPADotNet.Core.Ast.Explanation
 
         [JsonPropertyName("locals")]
         public List<ExplanationBinding> Locals { get; set; }
+
+        [JsonPropertyName("location")]
+        public ExplanationLocation Location { get; set; }
     }
 }

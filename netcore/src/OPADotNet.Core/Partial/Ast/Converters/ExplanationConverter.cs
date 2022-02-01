@@ -72,6 +72,9 @@ namespace OPADotNet.Core.Partial.Ast.Converters
             reader.ReadExpectPropertyName("locals");
             node.Locals = JsonSerializer.Deserialize<List<ExplanationBinding>>(ref reader, options);
 
+            reader.ReadExpectPropertyName("location");
+            node.Location = JsonSerializer.Deserialize<ExplanationLocation>(ref reader, options);
+
             reader.Read();
             if (reader.TokenType == JsonTokenType.PropertyName)
             {

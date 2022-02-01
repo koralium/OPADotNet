@@ -23,7 +23,12 @@ namespace OPADotNet.Embedded.Discovery
         private readonly OpaClientEmbedded _opaClientEmbedded;
         private readonly DiscoveryHandler _discoveryHandler;
 
-        internal DiscoverySyncContext(OpaClientEmbedded opaClientEmbedded, DiscoveryHandler discoveryHandler) : base(new List<SyncPolicyDescriptor>(), opaClientEmbedded)
+        internal DiscoverySyncContext(
+            OpaClientEmbedded opaClientEmbedded, 
+            DiscoveryHandler discoveryHandler, 
+            List<Type> syncDoneHandlers,
+            IServiceProvider serviceProvider) 
+            : base(new List<SyncPolicyDescriptor>(), opaClientEmbedded, syncDoneHandlers, serviceProvider)
         {
             _opaClientEmbedded = opaClientEmbedded;
             _discoveryHandler = discoveryHandler;
@@ -31,7 +36,7 @@ namespace OPADotNet.Embedded.Discovery
 
         public override SyncContextIterationPolicies NewIteration()
         {
-            return new DiscoveryContextPolicies(_opaClientEmbedded, _discoveryHandler);
+            return new DiscoveryContextPolicies(_opaClientEmbedded, _discoveryHandler, this);
         }
     }
 }

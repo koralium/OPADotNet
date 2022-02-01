@@ -85,11 +85,7 @@ namespace OPADotNet.AspNetCore
                 List<SyncPolicyDescriptor> syncPolicyDescriptors = new List<SyncPolicyDescriptor>();
                 foreach (var requirement in requirements)
                 {
-                    syncPolicyDescriptors.Add(new SyncPolicyDescriptor()
-                    {
-                        PolicyName = requirement.ModuleName,
-                        Unknown = requirement.DataName
-                    });
+                    syncPolicyDescriptors.Add(new SyncPolicyDescriptor(requirement.ModuleName, requirement.DataName));
                 }
 
                 await _discoveryHandler.Start(syncPolicyDescriptors);

@@ -19,10 +19,23 @@ namespace OPADotNet.Embedded.sync
 {
     internal class SyncPolicy
     {
-        public string PolicyName { get; set; }
+        public string PolicyName { get; }
 
-        public HashSet<string> DataSets { get; set; }
+        public HashSet<string> DataSets { get; }
 
-        public string Raw { get; set; }
+        public string Raw { get; internal set; }
+
+        public SyncPolicy(string policyName, HashSet<string> dataSets, string raw)
+        {
+            PolicyName = policyName;
+            DataSets = dataSets;
+            Raw = raw;
+        }
+
+        public SyncPolicy(string policyName, HashSet<string> dataSets)
+        {
+            PolicyName = policyName;
+            DataSets = dataSets;
+        }
     }
 }
