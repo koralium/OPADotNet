@@ -144,5 +144,12 @@ namespace OPADotNet.Ast
         {
             return default;
         }
+
+        public virtual T VisitWith(AstWith with)
+        {
+            Visit(with.Target);
+            Visit(with.Value);
+            return default;
+        }
     }
 }

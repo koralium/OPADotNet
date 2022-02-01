@@ -28,7 +28,21 @@ namespace OPADotNet.Partial.Ast.Converters
         {
             reader.CheckType(JsonTokenType.StartObject);
 
-            reader.ReadExpectPropertyName("terms");
+            reader.ReadCheckType(JsonTokenType.PropertyName);
+
+            var propName = reader.GetPropertyName();
+
+            List<AstWith>? withArray = null;
+            if (propName == "with")
+            {
+                reader.ReadThrow();
+                withArray = JsonSerializer.Deserialize<List<AstWith>>(ref reader, options);
+                reader.ReadExpectPropertyName("terms");
+            }
+            else
+            {
+                reader.ExpectPropertyName("terms");
+            }
 
             reader.ReadThrow();
 
@@ -56,7 +70,8 @@ namespace OPADotNet.Partial.Ast.Converters
             return new AstExpression()
             {
                 Index = index,
-                Terms = terms
+                Terms = terms,
+                With = withArray
             };
         }
 
