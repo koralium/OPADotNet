@@ -38,3 +38,47 @@ Request Query
       "2"
     ]
   }
+
+Type specific
+--------------
+
+This part contains information of any C# part that requires extra explanation when used as the input.
+
+Enums
+******
+
+An enum value is always converted to a string when used in an input, example:
+
+C# enum:
+
+.. code-block:: csharp
+
+  private enum Enum
+  {
+      Value1 = 0,
+      Value2 = 1
+  }
+
+Policy:
+
+.. code-block::
+
+  package example
+
+  default allow = false
+  allow {
+    input.value = ""Value1""
+  }
+
+Will give the correct result while
+
+.. code-block::
+
+  package example
+
+  default allow = false
+  allow {
+    input.value = 0
+  }
+
+Will result in a failure.

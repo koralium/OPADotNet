@@ -27,11 +27,6 @@ namespace OPADotNet.Embedded
 {
     internal class PreparedPartialEmbedded : IPreparedPartial, IPreparedEmbedded
     {
-        private static JsonSerializerOptions serializerOptions = new JsonSerializerOptions()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-
         private int _preparedQueryId;
         private bool disposedValue;
         private readonly string _query;
@@ -47,7 +42,7 @@ namespace OPADotNet.Embedded
         public Task<PartialResult> Partial(object input, IEnumerable<string> unknowns, bool explain = false)
         {
             var unknownsArray = unknowns.ToArray();
-            var inputJson = JsonSerializer.Serialize(input, serializerOptions);
+            var inputJson = JsonSerializer.Serialize(input, JsonOptionsHelper.SerializerOptions);
 
             var t = new TaskCompletionSource<PartialResult>();
             int result = RegoWrapper.PreparedPartial(_preparedQueryId, inputJson, unknownsArray, unknownsArray.Length, explain);
