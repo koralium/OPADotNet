@@ -27,7 +27,7 @@ namespace OPADotNet.AspNetCore.Tests.Reasons
             {
                 new ReasonAndCondition(new List<ReasonMessage>(){ new ReasonMessage("test2") })
             }));
-            var expected = "test1\r\n* test2";
+            var expected = $"test1{Environment.NewLine}* test2";
             Assert.AreEqual(expected, actual);
         }
 
@@ -40,7 +40,7 @@ namespace OPADotNet.AspNetCore.Tests.Reasons
                 new ReasonAndCondition(new List<ReasonMessage>(){ new ReasonMessage("test2") }),
                 new ReasonAndCondition(new List<ReasonMessage>(){ new ReasonMessage("test3") })
             }));
-            var expected = "test1\r\nAll must be true:\r\n* test2\r\n* test3";
+            var expected = $"test1{Environment.NewLine}All must be true:{Environment.NewLine}* test2{Environment.NewLine}* test3";
             Assert.AreEqual(expected, actual);
         }
 
@@ -52,7 +52,7 @@ namespace OPADotNet.AspNetCore.Tests.Reasons
             {
                 new ReasonAndCondition(new List<ReasonMessage>(){ new ReasonMessage("test2"), new ReasonMessage("test3") }),
             }));
-            var expected = "test1\r\n* One must be true:\r\n  - test2\r\n  - test3";
+            var expected = $"test1{Environment.NewLine}* One must be true:{Environment.NewLine}  - test2{Environment.NewLine}  - test3";
             Assert.AreEqual(expected, actual);
         }
     }
