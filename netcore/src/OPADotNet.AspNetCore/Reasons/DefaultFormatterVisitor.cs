@@ -8,8 +8,8 @@ namespace OPADotNet.AspNetCore.Reasons
 {
     internal class DefaultFormatterVisitor : ReasonVisitor<string, int>
     {
-        private const string AndText    = "All must be true:\r\n";
-        private const string OrText     = "One must be true:\r\n";
+        private static readonly string AndText    = $"All must be true:{Environment.NewLine}";
+        private static readonly string OrText     = $"One must be true:{Environment.NewLine}";
         public override string VisitReasonMessage(ReasonMessage reasonMessage, int state)
         {
             int extraPadding = 0;
