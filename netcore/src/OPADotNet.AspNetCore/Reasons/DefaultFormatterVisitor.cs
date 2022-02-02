@@ -70,7 +70,7 @@ namespace OPADotNet.AspNetCore.Reasons
             if (reasonAndCondition.OrConditions.Count > 1)
             {
                 var text = Visit(reasonAndCondition.OrConditions, state + 2).Select(x => x).Where(x => !string.IsNullOrEmpty(x));
-                var conditionText = OrText.PadLeft(OrText.Length + state) + String.Join(Environment.NewLine, text.Select(x => $"- {x}").Select(x => x.PadLeft(x.Length + state)));
+                var conditionText = OrText + String.Join(Environment.NewLine, text.Select(x => $"- {x}").Select(x => x.PadLeft(x.Length + state)));
                 return conditionText;
             }
             else if (reasonAndCondition.OrConditions.Count == 1)
