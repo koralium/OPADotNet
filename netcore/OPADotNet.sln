@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31129.286
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OPADotNet.Embedded", "src\OPADotNet.Embedded\OPADotNet.Embedded.csproj", "{250FCD17-F06C-4490-9DE5-055F4014D9E6}"
 EndProject
@@ -34,6 +34,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OPADotNet.Automapper", "src\OPADotNet.Automapper\OPADotNet.Automapper.csproj", "{4A9CED52-D4B1-4152-8F5A-2A15A90DBF7C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OPADotNet.Automapper.Tests", "tests\OPADotNet.Automapper.Tests\OPADotNet.Automapper.Tests.csproj", "{83381646-C4C5-4AC3-946D-45687653AFA8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OPADotNet.Core.Tests", "tests\OPADotNet.Core.Tests\OPADotNet.Core.Tests.csproj", "{90CD7143-9237-4998-AB76-A98EF805B54E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -201,6 +203,18 @@ Global
 		{83381646-C4C5-4AC3-946D-45687653AFA8}.Release|x64.Build.0 = Release|Any CPU
 		{83381646-C4C5-4AC3-946D-45687653AFA8}.Release|x86.ActiveCfg = Release|Any CPU
 		{83381646-C4C5-4AC3-946D-45687653AFA8}.Release|x86.Build.0 = Release|Any CPU
+		{90CD7143-9237-4998-AB76-A98EF805B54E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90CD7143-9237-4998-AB76-A98EF805B54E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90CD7143-9237-4998-AB76-A98EF805B54E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{90CD7143-9237-4998-AB76-A98EF805B54E}.Debug|x64.Build.0 = Debug|Any CPU
+		{90CD7143-9237-4998-AB76-A98EF805B54E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{90CD7143-9237-4998-AB76-A98EF805B54E}.Debug|x86.Build.0 = Debug|Any CPU
+		{90CD7143-9237-4998-AB76-A98EF805B54E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90CD7143-9237-4998-AB76-A98EF805B54E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90CD7143-9237-4998-AB76-A98EF805B54E}.Release|x64.ActiveCfg = Release|Any CPU
+		{90CD7143-9237-4998-AB76-A98EF805B54E}.Release|x64.Build.0 = Release|Any CPU
+		{90CD7143-9237-4998-AB76-A98EF805B54E}.Release|x86.ActiveCfg = Release|Any CPU
+		{90CD7143-9237-4998-AB76-A98EF805B54E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -219,6 +233,7 @@ Global
 		{31B8DDC6-4487-4802-A47C-DFF6F19B5523} = {7C9C2CCF-4FA7-441A-9A23-4957B4921AE9}
 		{4A9CED52-D4B1-4152-8F5A-2A15A90DBF7C} = {CA32682B-E7CF-48C0-A957-0549E4175D86}
 		{83381646-C4C5-4AC3-946D-45687653AFA8} = {7C9C2CCF-4FA7-441A-9A23-4957B4921AE9}
+		{90CD7143-9237-4998-AB76-A98EF805B54E} = {7C9C2CCF-4FA7-441A-9A23-4957B4921AE9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {93B03AAC-2AD2-4660-B419-038FB531515B}
