@@ -31,8 +31,11 @@ namespace OPADotNet.Core.Tests.Ast
                 Value = new AstTermString() { Value = "4" }
             };
 
+            var otherType = new object();
+
             Assert.True(astWith.Equals(astWithCopy));
             Assert.False(astWith.Equals(other));
+            Assert.False(astWith.Equals(otherType));
         }
 
         [Test]
