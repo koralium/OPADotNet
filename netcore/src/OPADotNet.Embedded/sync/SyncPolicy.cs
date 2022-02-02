@@ -23,6 +23,6 @@ namespace OPADotNet.Embedded.sync
 
         public HashSet<string> DataSets { get; set; }
 
-        public string Raw { get; set; }
+        public Dictionary<string, string> Raw { get; set; }
     }
 }
