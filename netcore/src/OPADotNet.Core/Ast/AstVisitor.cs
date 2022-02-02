@@ -59,6 +59,7 @@ namespace OPADotNet.Ast
         public virtual T VisitExpression(AstExpression partialExpression)
         {
             Visit(partialExpression.Terms);
+            Visit(partialExpression.With);
             return default(T);
         }
 
