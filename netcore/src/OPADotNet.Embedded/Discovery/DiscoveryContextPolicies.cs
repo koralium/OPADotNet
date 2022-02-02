@@ -39,7 +39,7 @@ namespace OPADotNet.Embedded.Discovery
                 {
                     DataSets = new HashSet<string>(),
                     PolicyName = addedPolicy.Id,
-                    Raw = addedPolicy.Raw
+                    Raw = new Dictionary<string, string>() { { addedPolicy.Id, addedPolicy.Raw } }
                 });
             }
 

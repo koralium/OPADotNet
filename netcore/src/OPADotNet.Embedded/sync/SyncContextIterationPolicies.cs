@@ -117,14 +117,24 @@ namespace OPADotNet.Embedded.sync
             foreach (var policy in policies)
             {
                 var syncPolicy = visitor.Visit(policy.Ast);
-                syncPolicy.Raw = policy.Raw;
 
-                if (_existingPolices.ContainsKey(syncPolicy.PolicyName))
+                if (_existingPolices.TryGetValue(syncPolicy.PolicyName, out var existingPolicy))
                 {
-                    _existingPolices[syncPolicy.PolicyName] = syncPolicy;
+                    if (existingPolicy.Raw.ContainsKey(policy.Id))
+                    {
+                        existingPolicy.Raw[policy.Id] = policy.Raw;
+                    }
+                    else
+                    {
+                        existingPolicy.Raw.Add(policy.Id, policy.Raw);
+                    }
+                    
+                    existingPolicy.DataSets.UnionWith(syncPolicy.DataSets);
                 }
                 else
                 {
+                    syncPolicy.Raw = new Dictionary<string, string>();
+                    syncPolicy.Raw.Add(policy.Id, policy.Raw);
                     _existingPolices.Add(syncPolicy.PolicyName, syncPolicy);
                 }
             }
