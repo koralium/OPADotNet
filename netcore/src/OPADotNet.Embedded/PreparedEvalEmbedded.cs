@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace OPADotNet.Embedded
@@ -60,7 +61,7 @@ namespace OPADotNet.Embedded
                 input = emptyInput;
             }
 
-            var inputJson = JsonSerializer.Serialize(input);
+            var inputJson = JsonSerializer.Serialize(input, options: JsonOptionsHelper.SerializerOptions);
 
             var t = new TaskCompletionSource<IEnumerable<TBinding>>();
             int result = RegoWrapper.PreparedEval(_preparedEvalId, inputJson);

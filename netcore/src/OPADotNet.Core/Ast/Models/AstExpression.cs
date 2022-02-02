@@ -24,6 +24,8 @@ namespace OPADotNet.Ast.Models
 
         public List<AstTerm> Terms { get; set; }
 
+        public List<AstWith>? With { get; set; }
+
         public override T Accept<T>(AstVisitor<T> visitor)
         {
             return visitor.VisitExpression(this);
@@ -34,7 +36,8 @@ namespace OPADotNet.Ast.Models
             if (obj is AstExpression other)
             {
                 return Equals(Index, other.Index) &&
-                    Terms.AreEqual(other.Terms);
+                    Terms.AreEqual(other.Terms) &&
+                    With.AreEqual(other.With);
             }
             return false;
         }
@@ -47,6 +50,14 @@ namespace OPADotNet.Ast.Models
             foreach(var term in Terms)
             {
                 hashCode.Add(term);
+            }
+
+            if (With != null)
+            {
+                foreach(var v in With)
+                {
+                    hashCode.Add(v);
+                }
             }
 
             return hashCode.ToHashCode();

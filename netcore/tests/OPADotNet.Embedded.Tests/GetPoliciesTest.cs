@@ -79,5 +79,30 @@ namespace OPADotNet.Embedded.Tests
 
             Assert.AreEqual(expected, policies);
         }
+
+        [Test]
+        public void TestGetPolicyWithStatementDoNotThrow()
+        {
+            OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded();
+            var txn = opaClientEmbedded.OpaStore.NewTransaction(true);
+            var rawPolicy = @"
+            package test
+
+            allow = true
+
+            test_case {
+                allow with input as {
+                    ""test"": ""t1""
+                }
+            }
+            ";
+            txn.UpsertPolicy("pol1", rawPolicy);
+            txn.Commit();
+
+            Assert.DoesNotThrowAsync(async () =>
+            {
+                var policies = await opaClientEmbedded.GetPolicies();
+            });
+        }
     }
 }
