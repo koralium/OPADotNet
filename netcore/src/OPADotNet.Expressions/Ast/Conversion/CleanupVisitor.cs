@@ -86,6 +86,7 @@ namespace OPADotNet.Expressions.Ast.Conversion
                     i--;
                 }
             }
+
             return queries;
         }
 
@@ -235,6 +236,17 @@ namespace OPADotNet.Expressions.Ast.Conversion
                 }
             }
             return booleanComparisonExpression;
+        }
+
+        public override Node VisitAnyCall(AnyCall anyCall)
+        {
+            for (int i = 0; i < anyCall.AndExpressions.Count; i++)
+            {
+                anyCall.AndExpressions[i] = Visit(anyCall.AndExpressions[i]) as BooleanExpression;
+            }
+            //Merge all any expressions that have the same property and parameter name
+            MergeAnyExpressions(anyCall.AndExpressions);
+            return anyCall;
         }
 
         public override Node VisitBooleanComparisonExpression(BooleanComparisonExpression booleanComparisonExpression)

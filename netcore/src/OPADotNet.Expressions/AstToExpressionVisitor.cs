@@ -152,8 +152,12 @@ namespace OPADotNet.Expressions
             var elementType = GetArrayElementType(member.Type);
 
             //Create parameter before visiting children
-            var lambdaParameter = Expression.Parameter(elementType);
-            _parameters.Add(anyCall.ParameterName, lambdaParameter);
+
+            if (!_parameters.TryGetValue(anyCall.ParameterName, out var lambdaParameter))
+            {
+                lambdaParameter = Expression.Parameter(elementType);
+                _parameters.Add(anyCall.ParameterName, lambdaParameter);
+            }
 
             var method = anyMethod.MakeGenericMethod(elementType);
 
