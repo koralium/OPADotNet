@@ -100,5 +100,8 @@ namespace OPADotNet.Embedded.Internal
             FreeString(index);
             return content;
         }
+
+        [DllImport("regosdk", EntryPoint = "FullPartial", CharSet = CharSet.Ansi)]
+        public static extern int FullPartial(int compilerId, int storeId, string query, string[] unknowns, int unknownsLength);
     }
 }

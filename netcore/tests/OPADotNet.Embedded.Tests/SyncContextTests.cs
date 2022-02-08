@@ -97,16 +97,9 @@ user_is_admin {
             OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded();
             SyncContext syncContext = new SyncContext(new List<SyncPolicyDescriptor>()
             {
-                new SyncPolicyDescriptor()
-                {
-                    PolicyName = "example",
-                    Unknown = "reports"
-                },
-                new SyncPolicyDescriptor()
-                {
-                    PolicyName = "rbac"
-                }
-            }, opaClientEmbedded);
+                new SyncPolicyDescriptor("example", "reports"),
+                new SyncPolicyDescriptor("rbac")
+            }, opaClientEmbedded, new List<Type>(), null);
 
             var policyStep = syncContext.NewIteration();
 

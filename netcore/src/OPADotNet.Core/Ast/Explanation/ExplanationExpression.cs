@@ -1,4 +1,5 @@
 ﻿using OPADotNet.Ast.Models;
+using OPADotNet.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text;

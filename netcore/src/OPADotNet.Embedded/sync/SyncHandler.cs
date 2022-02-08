@@ -51,10 +51,12 @@ namespace OPADotNet.Embedded.sync
         private readonly IServiceProvider _serviceProvider;
         private SyncContext _syncContext;
         private readonly ILogger _logger;
+        private readonly SyncOptions _syncOptions;
 
         public SyncHandler(
             OpaClientEmbedded opaClientEmbedded,
             ILogger<SyncHandler> logger,
+            SyncOptions syncOptions,
             IServiceProvider serviceProvider)
         {
             _opaClientEmbedded = opaClientEmbedded;
@@ -62,6 +64,7 @@ namespace OPADotNet.Embedded.sync
             _syncPolicyDescriptors = new List<SyncPolicyDescriptor>();
             _serviceProvider = serviceProvider;
             _logger = logger;
+            _syncOptions = syncOptions;
         }
 
         /// <summary>
@@ -151,7 +154,7 @@ namespace OPADotNet.Embedded.sync
             _syncPolicyDescriptors.AddRange(syncPolicyDescriptors);
 
             _logger.LogTrace("Configuring SyncContext");
-            _syncContext = new SyncContext(_syncPolicyDescriptors, _opaClientEmbedded);
+            _syncContext = new SyncContext(_syncPolicyDescriptors, _opaClientEmbedded, _syncOptions.SyncDoneHandlers, _serviceProvider);
 
             foreach(var syncServiceHolder in syncServices)
             {

@@ -28,10 +28,19 @@ namespace OPADotNet.AspNetCore.WebTest
         private static string moduleData = @"
         package localpolicy
 
-        default allow = false
-
+        # REASON: You must be an admin
         allow {
             input.identity = data.admin.name
+        }
+
+        # REASON: You must be a member
+        allow {
+            require_scope(""test"")
+        }
+
+        #REASON: You must have scope: {0}
+        require_scope(scope_name) {
+            input.subject.claims.scopes[_] = scope_name
         }
         ";
 
@@ -42,13 +51,13 @@ namespace OPADotNet.AspNetCore.WebTest
             services.AddControllers();
             //Add OPA and connects to an OPA server to get the policies and data required.
             services.AddOpa(x => x.AddSync(sync => sync
-                    .UseOpaServer("http://127.0.0.1:8181", TimeSpan.FromSeconds(10))
+                    //.UseOpaServer("http://127.0.0.1:8181", TimeSpan.FromSeconds(10))
                     .UseLocal(opt => opt.AddPolicy(moduleData))
-                ));
+                ).UseReasons());
 
             services.AddAuthorization(opt =>
             {
-                opt.AddPolicy("read", x => x.RequireOpaPolicy("example", "reports", "GET"));
+                opt.AddPolicy("read", x => x.RequireOpaPolicy("localpolicy", "reports", "GET"));
                 opt.AddPolicy("test", x => x.RequireOpaPolicy("localpolicy", "testdata", "GET", opt =>
                 {
                 }));

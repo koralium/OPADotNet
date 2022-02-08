@@ -33,11 +33,7 @@ namespace OPADotNet.Embedded.sync
             SyncDataVisitor syncDataVisitor = new SyncDataVisitor();
             syncDataVisitor.Visit(astPolicy.Rules);
 
-            return new SyncPolicy()
-            {
-                DataSets = syncDataVisitor.DataSets,
-                PolicyName = path
-            };
+            return new SyncPolicy(path, syncDataVisitor.DataSets);
         }
     }
 }

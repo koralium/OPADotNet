@@ -10,11 +10,7 @@ namespace OPADotNet.AspNetCore.Extensions
     {
         public static SyncPolicyDescriptor ToSyncPolicy(this OpaPolicyRequirement opaPolicyRequirement)
         {
-            return new SyncPolicyDescriptor()
-            {
-                PolicyName = opaPolicyRequirement.ModuleName,
-                Unknown = opaPolicyRequirement.DataName
-            };
+            return new SyncPolicyDescriptor(opaPolicyRequirement.ModuleName, opaPolicyRequirement.DataName);
         }
     }
 }

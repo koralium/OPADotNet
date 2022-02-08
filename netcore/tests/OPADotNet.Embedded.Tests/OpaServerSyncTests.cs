@@ -50,19 +50,17 @@ allow {
                 })
                 .RunServer(5020);
 
-            OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded();
-            SyncContext syncContext = new SyncContext(new List<SyncPolicyDescriptor>()
-            {
-                new SyncPolicyDescriptor()
-                {
-                    PolicyName = "example",
-                    Unknown = "reports"
-                }
-            }, opaClientEmbedded);
-
             ServiceCollection services = new ServiceCollection();
             services.AddLogging();
             var provider = services.BuildServiceProvider();
+
+            OpaClientEmbedded opaClientEmbedded = new OpaClientEmbedded();
+            SyncContext syncContext = new SyncContext(new List<SyncPolicyDescriptor>()
+            {
+                new SyncPolicyDescriptor("example", "reports")
+            }, opaClientEmbedded, new List<Type>(), provider);
+
+            
 
             OpaServerSync opaServerSync = new OpaServerSync(new OpaServerSyncOptions()
             {

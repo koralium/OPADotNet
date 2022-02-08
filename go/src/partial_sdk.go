@@ -50,3 +50,27 @@ func preparedPartial(prepared rego.PreparedPartialQuery, input interface{}, unkn
 	}
 	return res, err
 }
+
+func fullPartial(compiler *ast.Compiler, store storage.Store, query string, unknowns []string) (PartialResponse, error) {
+	var tracer = topdown.NewBufferTracer()
+	var i interface{}
+	r := rego.New(
+		rego.Query(query),
+		rego.Compiler(compiler),
+		rego.Store(store),
+		rego.QueryTracer(tracer),
+		rego.Input(i),
+		rego.Unknowns(unknowns),
+	)
+
+	ctx := context.Background()
+
+	partialResult, err := r.Partial(ctx)
+
+	expl, err := newRawTraceV1(*tracer)
+	res := PartialResponse{
+		Result:      partialResult,
+		Explanation: expl,
+	}
+	return res, err
+}

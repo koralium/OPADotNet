@@ -90,18 +90,14 @@ namespace OPADotNet.Embedded.Tests
             SyncServiceHolder syncServiceHolder = new SyncServiceHolderObject(new LocalSync(localSyncOptions));
 
             services.AddSingleton(new DiscoveryOptions(syncServiceHolder, "data"));
-            services.AddSingleton(new SyncOptions(new List<SyncServiceHolder>()));
+            services.AddSingleton(new SyncOptions(new List<SyncServiceHolder>(), new List<Type>()));
             services.AddSingleton<DiscoveryHandler>();
 
             DiscoveryHandler discoveryHandler = services.BuildServiceProvider().GetRequiredService<DiscoveryHandler>();
 
             await discoveryHandler.Start(new List<SyncPolicyDescriptor>()
             {
-                new SyncPolicyDescriptor()
-                {
-                    PolicyName = "example",
-                    Unknown = "reports"
-                }
+                new SyncPolicyDescriptor("example", "reports")
             });
 
             var readTxn = opaClientEmbedded.OpaStore.NewTransaction(false);

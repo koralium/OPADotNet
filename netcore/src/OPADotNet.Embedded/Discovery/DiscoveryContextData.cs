@@ -24,11 +24,11 @@ namespace OPADotNet.Embedded.Discovery
     {
         private readonly DiscoveryHandler _discoveryHandler;
 
-        internal DiscoveryContextData(OpaClientEmbedded opaClientEmbedded, List<SyncPolicy> policies, DiscoveryHandler discoveryHandler) 
+        internal DiscoveryContextData(OpaClientEmbedded opaClientEmbedded, List<SyncPolicy> policies, DiscoveryHandler discoveryHandler, SyncContext syncContext) 
             : base(opaClientEmbedded, policies, new DataSetNode("data", false)
                 {
                     UsedInPolicyMutable = true
-                })
+                }, syncContext)
         {
             _discoveryHandler = discoveryHandler;
         }

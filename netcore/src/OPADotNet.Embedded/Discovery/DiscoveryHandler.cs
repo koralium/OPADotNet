@@ -163,7 +163,7 @@ namespace OPADotNet.Embedded.Discovery
 
                 //Create a new embedded client to be used for the discovery
                 OpaClientEmbedded discoveryClient = new OpaClientEmbedded();
-                _discoverySyncContext = new DiscoverySyncContext(discoveryClient, this);
+                _discoverySyncContext = new DiscoverySyncContext(discoveryClient, this, new List<Type>(), _serviceProvider);
                 CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
                 if (_logger != null)

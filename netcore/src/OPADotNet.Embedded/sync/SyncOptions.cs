@@ -22,9 +22,12 @@ namespace OPADotNet.Embedded.sync
     {
         public IReadOnlyList<SyncServiceHolder> SyncServices { get; }
 
-        public SyncOptions(IReadOnlyList<SyncServiceHolder> syncServices)
+        public IReadOnlyList<Type> SyncDoneHandlers { get; }
+
+        public SyncOptions(IReadOnlyList<SyncServiceHolder> syncServices, IReadOnlyList<Type> syncDoneHandlers)
         {
             SyncServices = syncServices;
+            SyncDoneHandlers = syncDoneHandlers;
         }
     }
 }

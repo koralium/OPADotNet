@@ -74,3 +74,25 @@ func PreparedPartial(partialId int, input *C.char, unknowns **C.char, unknownsLe
 
 	return addString(string(bytes))
 }
+
+//export FullPartial
+func FullPartial(compilerId int, storeId int, query *C.char, unknowns **C.char, unknownsLength C.int) C.int {
+	queryData := C.GoString(query)
+	compiler := getCompiler(compilerId)
+	store := getStore(storeId)
+	unknownsArray := GoStrings(unknownsLength, unknowns)
+
+	pq, err := fullPartial(compiler, store, queryData, unknownsArray)
+
+	if err != nil {
+		return addError(err.Error())
+	}
+
+	bytes, err := json.Marshal(pq)
+
+	if err != nil {
+		return addError(err.Error())
+	}
+
+	return addString(string(bytes))
+}

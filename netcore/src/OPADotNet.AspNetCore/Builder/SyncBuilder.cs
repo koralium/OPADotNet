@@ -24,6 +24,7 @@ namespace OPADotNet.AspNetCore.Builder
     internal class SyncBuilder : ISyncBuilder
     {
         private readonly List<SyncServiceHolder> _syncServices = new List<SyncServiceHolder>();
+        private readonly List<Type> _syncDoneHandlers = new List<Type>();
 
         public IServiceCollection Services { get; }
 
@@ -32,7 +33,8 @@ namespace OPADotNet.AspNetCore.Builder
             Services = services;
         }
 
-        public ISyncBuilder AddSyncService<T>(T service) where T : ISyncService
+        public ISyncBuilder AddSyncService<T>(T service) 
+            where T: ISyncService
         {
             _syncServices.Add(new SyncServiceHolderObject(service));
             return this;
@@ -41,6 +43,11 @@ namespace OPADotNet.AspNetCore.Builder
         public ISyncBuilder AddSyncService<T>() where T : ISyncService
         {
             return AddSyncService(typeof(T));
+        }
+
+        public ISyncBuilder AddSyncDoneHandler<T>() where T : ISyncDoneHandler
+        {
+            return AddSyncDoneHandler(typeof(T));
         }
 
         public ISyncBuilder AddSyncService(Type type)
@@ -53,9 +60,20 @@ namespace OPADotNet.AspNetCore.Builder
             return this;
         }
 
+        public ISyncBuilder AddSyncDoneHandler(Type type)
+        {
+            if (!typeof(ISyncDoneHandler).IsAssignableFrom(type))
+            {
+                throw new ArgumentException($"'{type.Name}' does not implement the ISyncDoneHandler interface", nameof(type));
+            }
+            Services.AddScoped(type);
+            _syncDoneHandlers.Add(type);
+            return this;
+        }
+
         internal SyncOptions Build()
         {
-            return new SyncOptions(_syncServices.ToList());
+            return new SyncOptions(_syncServices.ToList(), _syncDoneHandlers.ToList());
         }
     }
 }

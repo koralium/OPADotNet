@@ -13,5 +13,20 @@ namespace OPADotNet.Core.Ast.Explanation
 
         [JsonPropertyName("value")]
         public AstTerm Value { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is ExplanationBinding other)
+            {
+                return Equals(Key, other.Key) &&
+                    Equals(Value, other.Value);
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Key, Value);
+        }
     }
 }

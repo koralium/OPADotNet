@@ -15,3 +15,4 @@ Welcome to OPADotNet's documentation!
    authmethods
    remotedata
    automapper
+   reasons

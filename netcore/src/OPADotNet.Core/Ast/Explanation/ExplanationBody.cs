@@ -1,4 +1,5 @@
 ﻿using OPADotNet.Ast.Models;
+using OPADotNet.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,5 +15,7 @@ namespace OPADotNet.Core.Ast.Explanation
         public new AstBody Node { get; set; }
 
         private protected override AstNode GetNode() => Node;
+
+        
     }
 }

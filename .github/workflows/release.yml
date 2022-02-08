@@ -85,6 +85,15 @@ jobs:
         NUGET_KEY: ${{ secrets.NUGET_KEY }}
         TAG_COMMIT: false
         VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
-    
+    # Publish reason nuget
+    - name: publish reason
+      id: publish_nuget_reason
+      uses: rohith/publish-nuget@v2
+      with:
+        PROJECT_FILE_PATH: netcore/src/OPADotNet.Reasons/OPADotNet.Reasons.csproj
+        PACKAGE_NAME: OPADotNet.Reasons
+        NUGET_KEY: ${{ secrets.NUGET_KEY }}
+        TAG_COMMIT: false
+        VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
     
     

@@ -19,6 +19,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\OPADotNet.Embedded\OPADotNet.Embedded.csproj" />
 		<ProjectReference Include="..\OPADotNet.Expressions\OPADotNet.Expressions.csproj" />
+		<ProjectReference Include="..\OPADotNet.Reasons\OPADotNet.Reasons.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

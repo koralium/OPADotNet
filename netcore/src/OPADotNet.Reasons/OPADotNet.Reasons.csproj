@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;netcoreapp3.1;net6.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OPADotNet.Core\OPADotNet.Core.csproj" />
+    <ProjectReference Include="..\OPADotNet.Embedded\OPADotNet.Embedded.csproj" />
+  </ItemGroup>
+
+</Project>
