@@ -59,7 +59,10 @@ namespace OPADotNet.Embedded.sync
             //Write the policies into the store
             foreach (var usedPolicy in _policies)
             {
-                _opaTransaction.UpsertPolicy(usedPolicy.PolicyName, usedPolicy.Raw);
+                foreach(var kv in usedPolicy.Raw)
+                {
+                    _opaTransaction.UpsertPolicy(kv.Key, kv.Value);
+                }
             }
 
             //Commit all the data changes and policies

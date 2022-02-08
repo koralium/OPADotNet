@@ -37,7 +37,7 @@ namespace OPADotNet.Embedded.Discovery
 
             foreach(var addedPolicy in AddedPolicies)
             {
-                syncPolicies.Add(new SyncPolicy(addedPolicy.Id, new HashSet<string>(), addedPolicy.Raw));
+                syncPolicies.Add(new SyncPolicy(addedPolicy.Id, new HashSet<string>(), new Dictionary<string, string>() { { addedPolicy.Id, addedPolicy.Raw } }));
             }
 
             return new DiscoveryContextData(_opaClientEmbedded, syncPolicies, _discoveryHandler, _syncContext);

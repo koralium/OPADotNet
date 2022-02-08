@@ -68,7 +68,7 @@ namespace OPADotNet.Embedded.utils
             foreach (var policy in policies)
             {
                 var syncPolicy = visitor.Visit(policy.Ast);
-                syncPolicy.Raw = policy.Raw;
+                syncPolicy.Raw = new Dictionary<string, string>() { { policy.Id, policy.Raw } };
 
                 if (existingPolices.ContainsKey(syncPolicy.PolicyName))
                 {
