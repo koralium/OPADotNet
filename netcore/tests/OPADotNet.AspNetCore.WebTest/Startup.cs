@@ -53,7 +53,7 @@ namespace OPADotNet.AspNetCore.WebTest
             services.AddOpa(x => x.AddSync(sync => sync
                     //.UseOpaServer("http://127.0.0.1:8181", TimeSpan.FromSeconds(10))
                     .UseLocal(opt => opt.AddPolicy(moduleData))
-                ));
+                ).UseReasons());
 
             services.AddAuthorization(opt =>
             {

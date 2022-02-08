@@ -31,7 +31,7 @@ namespace OPADotNet.AspNetCore.Builder
         private readonly SyncBuilder _syncBuilder;
 
         private bool _syncAdded = false;
-        private bool _useReasons = true;
+        private bool _useReasons = false;
 
         internal OpaBuilder(IServiceCollection services)
         {
@@ -129,7 +129,7 @@ namespace OPADotNet.AspNetCore.Builder
                 throw new InvalidOperationException("Reasons only work in embedded mode.");
             }
 
-            return new OpaOptions(url, embeddedMode, syncOptions, _discoveryOptions);
+            return new OpaOptions(url, embeddedMode, syncOptions, _discoveryOptions, _useReasons);
         }
     }
 }

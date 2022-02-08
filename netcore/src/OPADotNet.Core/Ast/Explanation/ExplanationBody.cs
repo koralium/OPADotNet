@@ -30,22 +30,7 @@ namespace OPADotNet.Core.Ast.Explanation
 
         public override int GetHashCode()
         {
-            HashCode hash = new HashCode();
-            hash.Add(Operation);
-            hash.Add(QueryId);
-            hash.Add(ParentId);
-            hash.Add(Type);
-            hash.Add(Node);
-            hash.Add(Message);
-            hash.Add(Location);
-            hash.Add(Type);
-            hash.Add(Node);
-
-            foreach(var local in Locals)
-            {
-                hash.Add(local);
-            }
-            return hash.ToHashCode();
+            return base.GetHashCode();
         }
 
         private protected override AstNode GetNode() => Node;

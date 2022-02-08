@@ -29,16 +29,20 @@ namespace OPADotNet.AspNetCore.Builder
 
         public DiscoveryOptions DiscoveryOptions { get; }
 
+        public bool UseReasons { get; }
+
         public OpaOptions(
             Uri opaServer,
             bool useEmbedded,
             SyncOptions syncOptions,
-            DiscoveryOptions discoveryOptions)
+            DiscoveryOptions discoveryOptions,
+            bool useReasons)
         {
             OpaServer = opaServer;
             UseEmbedded = useEmbedded;
             SyncOptions = syncOptions;
             DiscoveryOptions = discoveryOptions;
+            UseReasons = useReasons;
         }
     }
 }

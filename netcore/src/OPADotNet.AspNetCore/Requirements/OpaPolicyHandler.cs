@@ -14,6 +14,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using OPADotNet.AspNetCore.Builder;
 using OPADotNet.AspNetCore.Extensions;
 using OPADotNet.AspNetCore.Input;
 using OPADotNet.AspNetCore.Reasons;
@@ -39,16 +40,19 @@ namespace OPADotNet.AspNetCore.Requirements
         private readonly SyncHandler _syncHandler;
         private readonly IReasonHandler _reasonHandler;
         private readonly IReasonFormatter _reasonFormatter;
+        private readonly OpaOptions _opaOptions;
 
         public OpaPolicyHandler(
             PreparedPartialStore preparedPartialStore,
             ExpressionConverter expressionConverter,
             ILogger<OpaPolicyHandler> logger,
             IHttpContextAccessor httpContextAccessor,
+            OpaOptions opaOptions,
             SyncHandler syncHandler = default,
             IReasonHandler reasonHandler = default,
             IReasonFormatter reasonFormatter = default)
         {
+            _opaOptions = opaOptions;
             _preparedPartialStore = preparedPartialStore;
             _logger = logger;
             _expressionConverter = expressionConverter;
@@ -103,7 +107,7 @@ namespace OPADotNet.AspNetCore.Requirements
             input.Extensions.Add(requirement.GetInputResourceName(), context.Resource);
             
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
-            var result = await preparedPartial.Partial(input, requirement.GetUnknowns(), true);
+            var result = await preparedPartial.Partial(input, requirement.GetUnknowns(), _opaOptions.UseReasons);
 
             if (result.Result.Queries == null)
             {
@@ -128,7 +132,7 @@ namespace OPADotNet.AspNetCore.Requirements
             var input = GetInput(context, requirement);
 
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
-            var result = await preparedPartial.Partial(input, requirement.GetUnknowns(), true);
+            var result = await preparedPartial.Partial(input, requirement.GetUnknowns(), _opaOptions.UseReasons);
 
             if (result.Result.Queries == null)
             {
@@ -149,7 +153,7 @@ namespace OPADotNet.AspNetCore.Requirements
             input.Extensions.Add(requirement.GetInputResourceName(), holder.Resource);
 
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
-            var result = await preparedPartial.Partial(input, requirement.GetUnknowns(), true);
+            var result = await preparedPartial.Partial(input, requirement.GetUnknowns(), _opaOptions.UseReasons);
 
             if (result.Result.Queries == null)
             {
@@ -174,7 +178,7 @@ namespace OPADotNet.AspNetCore.Requirements
             var input = GetInput(context, requirement);
 
             var preparedPartial = _preparedPartialStore.GetPreparedPartial(requirement);
-            var result = await preparedPartial.Partial(input, requirement.GetUnknowns(), true);
+            var result = await preparedPartial.Partial(input, requirement.GetUnknowns(), _opaOptions.UseReasons);
 
             //context.Fail(new AuthorizationFailureReason(this, "Message"));
             if (result.Result.Queries != null)
