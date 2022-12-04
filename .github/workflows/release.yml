@@ -25,6 +25,12 @@ jobs:
       uses: roryprimrose/set-vs-sdk-project-version@v1
       with:
         version: ${{ steps.tag.outputs.VERSION }}
+    - name: Install dependencies
+      run: dotnet restore
+      working-directory: netcore
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      working-directory: netcore
     - name: Package core
       run: dotnet pack -c Release -o . netcore/src/OPADotNet.Core/OPADotNet.Core.csproj
     - name: Package embedded
