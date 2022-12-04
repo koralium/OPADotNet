@@ -116,5 +116,17 @@ namespace OPADotNet.RestAPI
         {
             return new RestPreparedEvaluation(this, query);
         }
+
+        public virtual async Task UploadPolicy(string name, string content)
+        {
+            var httpClient = new HttpClient();
+            var c = new StringContent(content, Encoding.UTF8, "text/plain");
+            var response = await httpClient.PutAsync(new Uri(_httpUrl, $"/v1/policies/{name}"), c);
+
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                throw new Exception("Error uploading policy");
+            }
+        }
     }
 }
