@@ -25,75 +25,21 @@ jobs:
       uses: roryprimrose/set-vs-sdk-project-version@v1
       with:
         version: ${{ steps.tag.outputs.VERSION }}
-    # Publish Core nuget
-    - name: publish on version change
-      id: publish_nuget_core
-      uses: rohith/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: netcore/src/OPADotNet.Core/OPADotNet.Core.csproj
-        PACKAGE_NAME: OPADotNet.Core
-        NUGET_KEY: ${{ secrets.NUGET_KEY }}
-        TAG_COMMIT: false
-        VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
-    # Publish Embedded nuget
-    - name: publish on version change
-      id: publish_nuget_embedded
-      uses: rohith/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: netcore/src/OPADotNet.Embedded/OPADotNet.Embedded.csproj
-        PACKAGE_NAME: OPADotNet.Embedded
-        NUGET_KEY: ${{ secrets.NUGET_KEY }}
-        TAG_COMMIT: false
-        VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
-    # Publish Expressions nuget
-    - name: publish on version change
-      id: publish_nuget_expressions
-      uses: rohith/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: netcore/src/OPADotNet.Expressions/OPADotNet.Expressions.csproj
-        PACKAGE_NAME: OPADotNet.Expressions
-        NUGET_KEY: ${{ secrets.NUGET_KEY }}
-        TAG_COMMIT: false
-        VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
-    # Publish TestFramework nuget
-    - name: publish on version change
-      id: publish_nuget_testframework
-      uses: rohith/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: netcore/src/OPADotNet.TestFramework/OPADotNet.TestFramework.csproj
-        PACKAGE_NAME: OPADotNet.TestFramework
-        NUGET_KEY: ${{ secrets.NUGET_KEY }}
-        TAG_COMMIT: false
-        VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
-    # Publish AspNetCore nuget
-    - name: publish on version change
-      id: publish_nuget_aspnetcore
-      uses: rohith/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: netcore/src/OPADotNet.AspNetCore/OPADotNet.AspNetCore.csproj
-        PACKAGE_NAME: OPADotNet.AspNetCore
-        NUGET_KEY: ${{ secrets.NUGET_KEY }}
-        TAG_COMMIT: false
-        VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
-    # Publish Automapper nuget
-    - name: publish on version change
-      id: publish_nuget_automapper
-      uses: rohith/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: netcore/src/OPADotNet.Automapper/OPADotNet.Automapper.csproj
-        PACKAGE_NAME: OPADotNet.Automapper
-        NUGET_KEY: ${{ secrets.NUGET_KEY }}
-        TAG_COMMIT: false
-        VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
-    # Publish reason nuget
-    - name: publish reason
-      id: publish_nuget_reason
-      uses: rohith/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: netcore/src/OPADotNet.Reasons/OPADotNet.Reasons.csproj
-        PACKAGE_NAME: OPADotNet.Reasons
-        NUGET_KEY: ${{ secrets.NUGET_KEY }}
-        TAG_COMMIT: false
-        VERSION_STATIC: ${{ steps.tag.outputs.VERSION }}
+    - name: Package core
+      run: dotnet pack -c Release -o . netcore/src/OPADotNet.Core/OPADotNet.Core.csproj
+    - name: Package embedded
+      run: dotnet pack -c Release -o . netcore/src/OPADotNet.Embedded/OPADotNet.Embedded.csproj
+    - name: Package expressions
+      run: dotnet pack -c Release -o . netcore/src/OPADotNet.Expressions/OPADotNet.Expressions.csproj
+    - name: Package test framework
+      run: dotnet pack -c Release -o . netcore/src/OPADotNet.TestFramework/OPADotNet.TestFramework.csproj
+    - name: Package aspnetcore
+      run: dotnet pack -c Release -o . netcore/src/OPADotNet.AspNetCore/OPADotNet.AspNetCore.csproj
+    - name: Package automapper
+      run: dotnet pack -c Release -o . netcore/src/OPADotNet.Automapper/OPADotNet.Automapper.csproj
+    - name: Package reason
+      run: dotnet pack -c Release -o . netcore/src/OPADotNet.Reasons/OPADotNet.Reasons.csproj
+    - name: Publish
+      run: dotnet nuget push *.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json
     
     
